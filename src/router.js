@@ -19,44 +19,9 @@ const router = createRouter({
       component: () => import("./views/Account.vue"),
     },
     {
-      path: "/Wishlist",
-      name: "Wishlist",
-      component: () => import("./views/Wishlist.vue"),
-    },
-    {
-      path: "/OwnedBooks",
-      name: "OwnedBooks",
-      component: () => import("./views/OwnedBooks.vue"),
-    },
-    {
-      path: "/Search",
-      name: "Search",
-      component: () => import("./views/Search.vue"),
-    },
-    {
-      path: "/UserDatabasePage",
-      name: "UserDatabasePage",
-      component: () => import("./views/UserDatabasePage.vue"),
-    },
-    {
       path: "/AuthorDatabasePage",
       name: "AuthorDatabasePage",
       component: () => import("./views/AuthorDatabasePage.vue"),
-    },
-    {
-      path: "/PublisherDatabasePage",
-      name: "PublisherDatabasePage",
-      component: () => import("./views/PublisherDatabasePage.vue"),
-    },
-    {
-      path: "/GenreDatabasePage",
-      name: "GenreDatabasePage",
-      component: () => import("./views/GenreDatabasePage.vue"),
-    },
-    {
-      path: "/BookDatabasePage",
-      name: "BookDatabasePage",
-      component: () => import("./views/BookDatabasePage.vue"),
     },
   ],
 });

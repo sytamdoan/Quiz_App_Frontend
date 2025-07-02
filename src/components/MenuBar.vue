@@ -42,9 +42,6 @@ export default {
   <div>
     <v-app-bar color="primary" app dark>
       <v-btn class="mx-2" :to="{ name: 'Recommendations' }"> Get Recommendations </v-btn>
-      <v-btn class="mx-2" :to="{ name: 'Wishlist' }"> Wishlist </v-btn>
-      <v-btn class="mx-2" :to="{ name: 'OwnedBooks' }"> OwnedBooks </v-btn>
-      <v-btn class="mx-2" :to="{ name: 'Search' }"> Search </v-btn>
       <v-spacer></v-spacer>
 
       <v-menu v-model="menuVisible" offset-y>
@@ -58,20 +55,8 @@ export default {
           <v-list-item :to="{ name: 'Account' }" link>
             <v-list-item-title>Account</v-list-item-title>
           </v-list-item>
-          <v-list-item :to="{ name: 'BookDatabasePage' }" link>
-            <v-list-item-title>Book Database</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="user.role === 1" :to="{ name: 'AuthorDatabasePage' }" link>
+          <v-list-item :to="{ name: 'AuthorDatabasePage' }" link>
             <v-list-item-title>Author Database</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="user.role === 1" :to="{ name: 'PublisherDatabasePage' }" link>
-            <v-list-item-title>Publisher Database</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="user.role === 1" :to="{ name: 'GenreDatabasePage' }" link>
-            <v-list-item-title>Genre Database</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="user.role === 1" :to="{ name: 'UserDatabasePage' }" link>
-            <v-list-item-title>User Database</v-list-item-title>
           </v-list-item>
           <v-list-item :to="{ name: 'login' }" link>
             <v-list-item-title>Logout</v-list-item-title>
