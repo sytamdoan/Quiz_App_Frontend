@@ -65,13 +65,6 @@ function closeSnackBar() {
     </v-row>
 
     <v-row justify="center" class="mt-10">
-      <v-col cols="12">
-        <p>Questions, Comments, Concerns? Contact us!</p>
-        <p>adminSupport@gmail.com</p>
-      </v-col>
-    </v-row>
-
-    <v-row justify="center" class="mt-10">
       <v-col cols="12" sm="4" class="d-flex justify-center">
         <v-btn class="mx-2" @click="openUpdateAccount()" color="grey" variant="flat" >Edit Info</v-btn>
         <v-btn class="mx-2" color="red" variant="flat">Reset Password</v-btn>
