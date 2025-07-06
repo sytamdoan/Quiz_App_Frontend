@@ -2,10 +2,6 @@
 import { onMounted } from 'vue'
 import { ref, computed} from "vue";
 import LLMServices from "../services/LLMServices.js";
-import OwnedBooksServices from "../services/OwnedBooksServices.js";
-import WishlistBooksServices from "../services/WishlistBooksServices.js";
-import BookServices from "../services/BookServices.js";
-const OwnedBooks = ref([])
 const recommendedBooks = ref([])
 const isAddRecBook = ref(false);
 const selectedRecommendBook = ref({})
@@ -64,121 +60,6 @@ function getRecommendations() {
   });
 }
 
-async function fetchOwnedBooks() {
-  const response = await OwnedBooksServices.getOwnedBook()
-  console.log("Fetched books:", response.data);
-  OwnedBooks.value = response.data
-}
-
-async function addOwnedBook(recBook, token) {
-  const selectedStatus = statusOptions.value.find(
-    option => option.statusName === statusNameInput.value
-  );
-
-  if (!selectedStatus) {
-    snackbar.value.text = "Invalid reading status. Please choose a valid option.";
-    snackbar.value.color = "red";
-    snackbar.value.value = true;
-    return;
-  }
-
-  const statusId = selectedStatus.id;
-
-  const addPayload = {
-    ...recBook,
-    title: recBook.book.title,
-    link: recBook.book.link,
-    numPages: recBook.book.numPages,
-    publicationDate: recBook.book.publicationDate,
-    readingStatusTypesId: statusId,
-    score: recBook.bookRating.score,
-    description: recBook.bookRating.description
-  };
-
-  await OwnedBooksServices.addOwnedBook(addPayload, token)
-    .then(() => {
-      fetchOwnedBooks()
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Book Added";
-      isAddRecBook.value = false;
-      recommendedBooks.value = recommendedBooks.value.filter(bookArray => {
-        return bookArray.book !== recBook.book.title
-      });
-    })
-    .catch((error) => {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = error.response.data.message || "An unexpected error occurred";
-    });
-};
-
-async function addWishListBooks(recBook) {
-  const addPayload = {
-    bookId: selectRecommendBookID.value,
-    dateAdded: recBook.dateBought
-  };
-  await WishlistBooksServices.addWishlistBook(addPayload, token)
-    .then(() => {
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Book Wishlisted";
-      isAddRecBook.value = false;
-    })
-    .catch((error) => {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = "Issue Wishlisting Book";
-    });
-  
-}
-
-async function addItem(recBook) {
-  const addPayload = {
-    title: recBook.book.title,
-    numPages: recBook.book.numPages,
-    publicationDate: recBook.book.publicationDate,
-    link: recBook.book.link
-  };
-  await BookServices.addBook(addPayload)
-    .then((response) => {
-      selectRecommendBookID.value = response.data.id;
-      addWishListBooks(recBook);
-    })
-    .catch((error) => {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = "Issue Creating Book";
-    });
-};
-
-
-function openAddRecommendBook(recommendedBook, wishlistStatus) {
-  isWishlist.value = wishlistStatus;
-  selectedRecommendBook.value = {
-    book: {
-      title: recommendedBook.book,
-      numPages: '',
-      publicationDate: '',
-      link: ''
-    },
-    paidAmount: '',
-    author: [recommendedBook.author],
-    publisher: [recommendedBook.publisher],
-    dateBought: '',
-    userNotes: '',
-    readingStatusTypesId: null,
-    ReadingStatusType: {
-      statusName: ''  
-    },
-    bookRating: {
-      score: null,
-      description: ''
-    }
-  };
-  statusNameInput.value = 'To Read';
-  isAddRecBook.value = true;
-}
 
 function closeAddRecBook() {
   isAddRecBook.value = false;
@@ -205,9 +86,9 @@ function closeSnackBar() {
       <td class = "cursor-pointer" >{{recommendedBook.book}}</td>
       <td class = "cursor-pointer" >{{recommendedBook.author }}</td>
       <td class = "cursor-pointer" >{{recommendedBook.publisher }}</td>
-      <v-icon color="red" class="cursor-pointer" @click="openAddRecommendBook(recommendedBook, false)"> mdi-plus </v-icon>
+      <v-icon color="red" class="cursor-pointer"> mdi-plus </v-icon>
       |
-      <v-icon color="red" class="cursor-pointer" @click="openAddRecommendBook(recommendedBook, true)"> mdi-star </v-icon>
+      <v-icon color="red" class="cursor-pointer"> mdi-star </v-icon>
     </tr>
   </tbody>
   </v-table>
