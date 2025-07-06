@@ -46,7 +46,7 @@ onMounted(async () => {
     console.error(error)
   }
 });
-
+//whatever
 function getRecommendations() {
   fetchOwnedBooks().then(() => {
     LLMServices.getRecommendations(OwnedBooks.value)
