@@ -31,6 +31,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "dist/"
-          REMOTE_HOST: "ec2-3-137-200-92.us-east-2.compute.amazonaws.com"
+          REMOTE_HOST: "ec2-3-144-112-181.us-east-2.compute.amazonaws.com"
           REMOTE_USER: ubuntu
-          TARGET: "/var/www/html"
+          TARGET: "/var/www/html/QuizApp-frontend"
