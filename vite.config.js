@@ -7,7 +7,7 @@ import vuetify from "vite-plugin-vuetify";
 
 export default () => {
   const baseURL =
-    process.env.APP_ENV === "development" ? "/" : "/bookshelf-frontend/";
+    process.env.APP_ENV === "development" ? "/" : "/QuizApp-frontend/";
 
   return defineConfig({
     plugins: [vue(), vuetify({ autoImport: true })],
