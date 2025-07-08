@@ -23,6 +23,11 @@ const router = createRouter({
       name: "AuthorDatabasePage",
       component: () => import("./views/AuthorDatabasePage.vue"),
     },
+    {
+      path: "/UserDatabasePage",
+      name: "UserDatabasePage",
+      component: () => import("./views/UserDatabasePage.vue"),
+    },
   ],
 });
 
