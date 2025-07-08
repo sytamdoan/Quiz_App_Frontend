@@ -65,6 +65,14 @@ async function updateUser(id, User) {
     snackbar.value.text = "All fields must be filled.";
     return; 
   }
+
+  if(User.role < 0 || User.role > 2) {
+    snackbar.value.value = true;
+    snackbar.value.color = "red";
+    snackbar.value.text = "Invalid role range";
+    return; 
+  }
+
   await UserServices.updateUser(id, User)
     .then(() => {
       fetchUsers()
@@ -176,6 +184,9 @@ function closeSnackBar() {
       </v-card-actions>
     </v-card>
   </v-dialog>
+    <div class = "reminder">
+    Reminder: 0 is User/Student, 1 is Professor, 2 is Admin
+    </div>
     
     <v-snackbar v-model="snackbar.value" rounded="pill">
       {{ snackbar.text }}
@@ -196,5 +207,10 @@ function closeSnackBar() {
   text-align: center;
   margin: 0.5rem 0;
   font-weight: 600;
+}
+
+.reminder {
+    text-align: center;
+    font-size: 12px;
 }
 </style>
