@@ -19,9 +19,9 @@ const router = createRouter({
       component: () => import("./views/Account.vue"),
     },
     {
-      path: "/AuthorDatabasePage",
-      name: "AuthorDatabasePage",
-      component: () => import("./views/AuthorDatabasePage.vue"),
+      path: "/ClassDatabasePage",
+      name: "ClassDatabasePage",
+      component: () => import("./views/ClassDatabasePage.vue"),
     },
     {
       path: "/UserDatabasePage",
