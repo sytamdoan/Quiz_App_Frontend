@@ -67,7 +67,7 @@ async function updateClass(id, Class) {
     .catch((error) => {
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Last Name cannot be empty";
+      snackbar.value.text = "Something went wrong";
     });
 };
 
