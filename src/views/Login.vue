@@ -78,7 +78,12 @@ async function login() {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Login successful!";
-      router.push({ name: "Account" });
+      user.value = JSON.parse(localStorage.getItem("user"));
+      if(user.value.role === 1) {
+        router.push({ name: "ClassDatabasePage" });
+      } else {
+        router.push({ name: "Account" });
+      }
     })
     .catch((error) => {
       console.log(error);
