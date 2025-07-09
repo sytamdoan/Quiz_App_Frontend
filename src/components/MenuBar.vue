@@ -55,8 +55,8 @@ export default {
           <v-list-item :to="{ name: 'Account' }" link>
             <v-list-item-title>Account</v-list-item-title>
           </v-list-item>
-          <v-list-item :to="{ name: 'AuthorDatabasePage' }" link>
-            <v-list-item-title>Author Database</v-list-item-title>
+          <v-list-item :to="{ name: 'ClassDatabasePage' }" link>
+            <v-list-item-title>Class Database</v-list-item-title>
           </v-list-item>
           <v-list-item :to="{ name: 'UserDatabasePage' }" link>
             <v-list-item-title>User Database</v-list-item-title>
