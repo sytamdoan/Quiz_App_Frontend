@@ -3,9 +3,11 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import ClassServices from "../services/ClassServices.js";
+import { useRouter } from "vue-router";
 
-const Classs = ref([])
-const columns = ref(["ID","FirstName","MiddleName","LastName"])
+
+const Class = ref([])
+const router = useRouter();
 const selectedClass = ref({})
 const isUpdateClass = ref(false);
 const addClassCheck = ref(false);
@@ -17,7 +19,7 @@ const snackbar = ref({
 });
 
 const filteredData = computed(() => {
-  let data = Classs.value;
+  let data = Class.value;
   let keyword = searchQuery.value.toLowerCase();
   if (keyword) {
     data = data.filter((row) => {
@@ -89,7 +91,7 @@ async function addClass(Class) {
 
 async function fetchClass() {
   const response = await ClassServices.getClass()
-  Classs.value = response.data
+  Class.value = response.data
 }
 
 function openUpdateClass(Class, addClass) {
@@ -108,6 +110,10 @@ function closeUpdateClass() {
 
 function closeSnackBar() {
   snackbar.value.value = false;
+}
+
+function goToQuizPage(ClassID) {
+  router.push({ name: "QuizDatabasePage", params: {classID: ClassID} });
 }
 </script>
 
@@ -132,7 +138,7 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateClass(Class, false)">{{ Class.name }}</td>
         <td class = "cursor-pointer" @click="openUpdateClass(Class, false)">{{ Class.year }}</td>
         <td>
-          <a @click="" style="color: blue; cursor: pointer; text-decoration: underline;"> View Quizzes</a>
+          <a @click="goToQuizPage(Class.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Quizzes</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateClass(Class, false)"> mdi-pencil </v-icon>
           |

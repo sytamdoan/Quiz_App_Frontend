@@ -1,8 +1,8 @@
 import apiClient from "./services";
 
 export default {
-  getClass(classID) {
-    return apiClient.get("Class", classID);
+  getClass() {
+    return apiClient.get("Class");
   },
   addClass(Class) {
     return apiClient.post("/Class/", Class);
