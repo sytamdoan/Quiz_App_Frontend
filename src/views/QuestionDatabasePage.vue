@@ -128,27 +128,27 @@ function closeSnackBar() {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="Quiz in filteredData" :key="Quiz.id" class="mb-2">
-        <td class = "cursor-pointer" @click="openUpdateQuestion(Quiz, false)">{{ Quiz.id }}</td>
-        <td class = "cursor-pointer" @click="openUpdateQuestion(Quiz, false)">{{ Quiz.questionText }}</td>
+      <tr v-for="Question in filteredData" :key="Question.id" class="mb-2">
+        <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.id }}</td>
+        <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.questionText }}</td>
         <td>
           <a @click="" style="color: blue; cursor: pointer; text-decoration: underline;"> View Answers</a>
           |
-          <v-icon color="red" class="cursor-pointer" @click="openUpdateQuestion(Quiz, false)"> mdi-pencil </v-icon>
+          <v-icon color="red" class="cursor-pointer" @click="openUpdateQuestion(Question, false)"> mdi-pencil </v-icon>
           |
-          <v-icon color="red" class="cursor-pointer" @click="deleteQuestion(Quiz.id)"> mdi-delete </v-icon>
+          <v-icon color="red" class="cursor-pointer" @click="deleteQuestion(Question.id)"> mdi-delete </v-icon>
         </td>
       </tr>
     </tbody>
   </v-table>
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openUpdateQuestion(Question, true)">Add Quiz</v-btn>
+    <v-btn variant="flat" color="primary" @click="openUpdateQuestion(Question, true)">Add Question</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateQuestion" width="800">
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Update Quiz</v-card-title>
+      <v-card-title class="headline mb-2">Update Question</v-card-title>
       <v-card-text>
         <v-text-field
           v-model="selectedQuestion.questionText"
@@ -166,10 +166,10 @@ function closeSnackBar() {
           >Close</v-btn
         >
         <v-btn v-if="!addQuestionCheck" variant="flat" color="primary" @click="updateQuestion(selectedQuestion.id, selectedQuestion)"
-          >Update Quiz</v-btn
+          >Update Question</v-btn
         >
         <v-btn v-if="addQuestionCheck" variant="flat" color="primary" @click="addQuestion(selectedQuestion)"
-          >Add Quiz</v-btn
+          >Add Question</v-btn
         >
       </v-card-actions>
     </v-card>
