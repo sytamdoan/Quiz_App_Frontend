@@ -5,6 +5,11 @@ const router = createRouter({
   routes: [
     {
       path: "/",
+      name: "LandingPage",
+      component: () => import("./views/LandingPage.vue"),
+    },
+    {
+      path: "/login",
       name: "login",
       component: () => import("./views/Login.vue"),
     },
@@ -12,6 +17,11 @@ const router = createRouter({
       path: "/Recommendations",
       name: "Recommendations",
       component: () => import("./views/Recommendations.vue"),
+    },
+    {
+      path: "/JoinSession",
+      name: "JoinSession",
+      component: () => import("./views/JoinSession.vue"),
     },
     {
       path: "/Account",
