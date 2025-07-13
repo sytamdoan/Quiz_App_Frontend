@@ -53,7 +53,7 @@ async function deleteQuestion(id) {
       console.error(error);
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Couldn't Delete Question";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
@@ -69,7 +69,7 @@ async function updateQuestion(id, Question) {
     .catch((error) => {
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Something went wrong";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
@@ -85,7 +85,7 @@ async function addQuestion(Question) {
     .catch((error) => {
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Error";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
