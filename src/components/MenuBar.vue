@@ -41,7 +41,8 @@ export default {
 <template>
   <div>
     <v-app-bar color="primary" app dark>
-      <v-btn class="mx-2" :to="{ name: 'Recommendations' }"> Get Recommendations </v-btn>
+      <!-- <v-btn class="mx-2" :to="{ name: 'Recommendations' }"> Get Recommendations </v-btn> -->
+      <v-btn class="mx-2" :to="{ name: 'JoinSession' }"> Join Session </v-btn>
       <v-spacer></v-spacer>
 
       <v-menu v-model="menuVisible" offset-y>
