@@ -29,6 +29,11 @@ const router = createRouter({
       component: () => import("./views/QuizDatabasePage.vue"),
     },
     {
+      path: "/QuestionDatabasePage/:quizID",
+      name: "QuestionDatabasePage",
+      component: () => import("./views/QuestionDatabasePage.vue"),
+    },
+    {
       path: "/UserDatabasePage",
       name: "UserDatabasePage",
       component: () => import("./views/UserDatabasePage.vue"),

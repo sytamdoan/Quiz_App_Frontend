@@ -3,10 +3,11 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import QuizServices from "../services/QuizServices.js";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const Quiz = ref([])
 const route = useRoute();
+const router = useRouter();
 const myClassID = ref('')
 const selectedQuiz = ref({})
 const isUpdateQuiz = ref(false);
@@ -114,6 +115,10 @@ function closeUpdateQuiz() {
 function closeSnackBar() {
   snackbar.value.value = false;
 }
+
+function goToQuestionPage(QuizID) {
+  router.push({ name: "QuestionDatabasePage", params: {quizID: QuizID} });
+}
 </script>
 
 <template>
@@ -141,7 +146,7 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.subject }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.timeLimit }}</td>
         <td>
-          <a @click="" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
+          <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuiz(Quiz, false)"> mdi-pencil </v-icon>
           |
