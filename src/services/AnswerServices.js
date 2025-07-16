@@ -1,11 +1,11 @@
 import apiClient from "./services";
 
 export default {
-  getAnswer(questionID) {
-    return apiClient.get("/Quiz/" + questionID + "/Answer/");
+  getAnswer(questionId) {
+    return apiClient.get("/Question/" + questionId + "/Answers/");
   },
-  addAnswer(questionID, Answer) {
-    return apiClient.post("/Quiz/" + questionID + "/Answer/", Answer);
+  addAnswer(questionId, Answer) {
+    return apiClient.post("/Question/" + questionId + "/Answer/", Answer);
   },
   updateAnswer(answerId, Answer) {
     return apiClient.put("/Answer/" + answerId, Answer);

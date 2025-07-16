@@ -97,7 +97,9 @@ async function fetchData() {
 function openUpdateModal(Item, addItem) {
   addItemCheck.value = addItem;
     if(addItemCheck.value) {
-    selectedItem.value = {};
+    selectedItem.value = {
+      isCorrect:false
+    };
   } else {
     selectedItem.value = {...Item}
   }
@@ -135,8 +137,6 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.answerText }}</td>
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.isCorrect }}</td>
         <td>
-          <!-- <a @click="" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a> -->
-          |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateModal(Item, false)"> mdi-pencil </v-icon>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(Item.id)"> mdi-delete </v-icon>
@@ -151,54 +151,22 @@ function closeSnackBar() {
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Update Answer</v-card-title>
+      <v-card-title class="headline mb-2">Answer Modal</v-card-title>
       <v-card-text>
         <v-text-field
-          v-model="selectedItem.name"
-          label="Quiz Name"
+          v-model="selectedItem.answerText"
+          label="Answer Text"
           required
         ></v-text-field>
 
         <v-radio-group
-          v-model="selectedItem.type"
-          label="Quiz Type"
+          v-model="selectedItem.isCorrect"
+          label="Correct Answer?"
           required
         >
-          <v-radio label = "Quiz" :value="'quiz'" />
-          <v-radio label = "Poll" :value="'poll'" />
-        </v-radio-group>
-
-        <v-text-field
-          v-model="selectedItem.subject"
-          label="Quiz Subject"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model="selectedItem.timeLimit"
-          label="Time Limit"
-          type = "number"
-          required
-        ></v-text-field>
-
-        <v-radio-group
-          v-model="selectedItem.isResultsVisible"
-          label="Are Results Visible?"
-          required
-        >
-          <v-radio label = "Yes" :value="true" />
           <v-radio label = "No" :value="false" />
-        </v-radio-group>
-
-        <v-radio-group
-          v-model="selectedItem.isAnonymous"
-          label="Is This anonymous?"
-          required
-        >
           <v-radio label = "Yes" :value="true" />
-          <v-radio label = "No" :value="false" />
         </v-radio-group>
-
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -209,10 +177,10 @@ function closeSnackBar() {
           >Close</v-btn
         >
         <v-btn v-if="!addItemCheck" variant="flat" color="primary" @click="updateItem(selectedItem.id, selectedItem)"
-          >Update Quiz</v-btn
+          >Update Answer</v-btn
         >
         <v-btn v-if="addItemCheck" variant="flat" color="primary" @click="addItem(selectedItem)"
-          >Add Quiz</v-btn
+          >Add Answer</v-btn
         >
       </v-card-actions>
     </v-card>
