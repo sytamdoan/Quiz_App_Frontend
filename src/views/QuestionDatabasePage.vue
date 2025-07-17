@@ -7,6 +7,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const Question = ref([])
 const route = useRoute();
+const router = useRouter();
 const myQuizID = ref('')
 const selectedQuestion = ref({})
 const isUpdateQuestion = ref(false);
@@ -111,6 +112,10 @@ function closeUpdateQuestion() {
 function closeSnackBar() {
   snackbar.value.value = false;
 }
+
+function goToAnswerPage(questionID) {
+  router.push({ name: "AnswerDatabasePage", params: {questionID: questionID} });
+}
 </script>
 
 <template>
@@ -132,7 +137,7 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.id }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.questionText }}</td>
         <td>
-          <a @click="" style="color: blue; cursor: pointer; text-decoration: underline;"> View Answers</a>
+          <a @click="goToAnswerPage(Question.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Answers</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuestion(Question, false)"> mdi-pencil </v-icon>
           |
