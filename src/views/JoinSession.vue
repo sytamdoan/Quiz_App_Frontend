@@ -16,11 +16,6 @@ const sessionInfo = ref({
   sessionId: "",
 });
 
-onMounted(async () => {
-  localStorage.removeItem("user");
-});
-
-
 function joinQuizSession() {
     const isEmptyField = Object.values(sessionInfo.value).some(
         (value) => value === null || value === '' || value === undefined
