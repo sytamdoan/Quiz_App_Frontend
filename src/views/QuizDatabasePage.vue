@@ -57,7 +57,7 @@ async function deleteQuiz(id) {
       console.error(error);
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Couldn't Delete Quiz";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
@@ -73,7 +73,7 @@ async function updateQuiz(id, Quiz) {
     .catch((error) => {
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Something went wrong";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
@@ -89,7 +89,7 @@ async function addQuiz(Quiz) {
     .catch((error) => {
       snackbar.value.value = true;
       snackbar.value.color = "red";
-      snackbar.value.text = "Error";
+      snackbar.value.text = error.response.data.message;
     });
 };
 
@@ -134,7 +134,7 @@ function goToQuestionPage(QuizID) {
         <th class="text-left">ID</th>
         <th class="text-left">Name</th>
         <th class="text-left">Type</th>
-        <th class="text-left">subject</th>
+        <th class="text-left">Subject</th>
         <th class="text-left">Time Limit</th>
       </tr>
     </thead>
