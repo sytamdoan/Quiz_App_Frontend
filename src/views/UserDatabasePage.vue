@@ -2,9 +2,7 @@
 import { onMounted } from 'vue'
 import { ref, computed  } from "vue";
 import UserServices from "../services/UserServices.js";
-import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3001');
 const users = ref([])
 const selectedUser = ref({})
 const isUpdateUser = ref(false);
@@ -35,14 +33,6 @@ const filteredData = computed(() => {
 onMounted(async () => {
   try {
     fetchUsers();
-    socket.on("connect", () => {
-      socket.emit('sendShit', "hello");
-    })
-
-    socket.on('sendShit', () => {
-      console.log('HERE');
-    })
-
   } catch (error) {
     console.error("Cannot Fetch Users: ", error)
   }
