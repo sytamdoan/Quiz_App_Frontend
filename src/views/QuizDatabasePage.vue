@@ -8,8 +8,8 @@ import { useRoute, useRouter } from "vue-router";
 const Quiz = ref([])
 const route = useRoute();
 const router = useRouter();
-const myClassID = ref('')
-const selectedQuiz = ref({})
+const myClassID = ref('');
+const selectedQuiz = ref({});
 const isUpdateQuiz = ref(false);
 const addQuizCheck = ref(false);
 const searchQuery = ref('');
@@ -101,7 +101,9 @@ async function fetchQuiz() {
 function openUpdateQuiz(Quiz, addQuiz) {
   addQuizCheck.value = addQuiz;
     if(addQuizCheck.value) {
-    selectedQuiz.value = {};
+    selectedQuiz.value = {
+      isEditable:true
+    };
   } else {
     selectedQuiz.value = {...Quiz}
   }
@@ -205,6 +207,16 @@ function goToQuestionPage(QuizID) {
           v-model="selectedQuiz.isAnonymous"
           label="Is This anonymous?"
           required
+        >
+          <v-radio label = "Yes" :value="true" />
+          <v-radio label = "No" :value="false" />
+        </v-radio-group>
+
+        <v-radio-group
+          v-model="selectedQuiz.isEditable"
+          label="Is This Editable?"
+          required
+          disabled
         >
           <v-radio label = "Yes" :value="true" />
           <v-radio label = "No" :value="false" />
