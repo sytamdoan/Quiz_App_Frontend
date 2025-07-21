@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import { ref, computed  } from "vue";
 
 const socket = io('http://localhost:3001');
-const quizID = ref(1);
+const quizSessionID = ref(1);
 const currentQuestion = ref("");
 const answerSet = ref({})
 const selectedAnswer = ref();
@@ -14,11 +14,11 @@ onMounted(async () => {
     socket.on("connect", () => {
       console.log("Connnected To Backend From Student Side");
     })
-    socket.on(quizID.value + "question", (data) => {
+    socket.on(quizSessionID.value + "question", (data) => {
       currentQuestion.value = data;
     })
 
-    socket.on(quizID.value + "answer", (data) => {
+    socket.on(quizSessionID.value + "answer", (data) => {
       answerSet.value = data;
     })
 

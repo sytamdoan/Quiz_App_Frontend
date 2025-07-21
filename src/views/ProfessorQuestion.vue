@@ -6,6 +6,7 @@ import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
 
 const socket = io('http://localhost:3001');
+const quizSessionID = ref(1);
 const quizID = ref(1);
 const questionSet = ref({})
 const answerSet = ref({})
@@ -20,6 +21,7 @@ onMounted(async () => {
     sendQuestionsAndAnswers();
 
   } catch (error) {
+    console.log(error);
     console.error("Something Wrong Happened")
   }
 });
@@ -41,7 +43,6 @@ async function grabQuestions() {
 async function grabAnswers(questionID) {
   await AnswerServices.getAnswer(questionID)
     .then((res) => {
-      console.log(res);
       answerSet.value = res.data.map(newAnswer => ({
         id: newAnswer.id,
         answerText: newAnswer.answerText,
@@ -55,6 +56,7 @@ async function grabAnswers(questionID) {
 
 async function sendQuestion() {
   socket.emit("question", {
+    quizSessionID: quizSessionID.value,
     id: questionSet.value[currentQuestion.value].id,
     question: questionSet.value[currentQuestion.value].questionText,
     quizID: questionSet.value[currentQuestion.value].quizId
@@ -63,6 +65,7 @@ async function sendQuestion() {
 
 async function sendAnswers() {
   socket.emit("answers", {
+    quizSessionID: quizSessionID.value,
     quizID: quizID.value,
     answerSet: answerSet.value
   });
