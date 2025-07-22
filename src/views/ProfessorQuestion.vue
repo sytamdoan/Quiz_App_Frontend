@@ -22,7 +22,7 @@ onMounted(async () => {
       console.log("Connnected To Backend From Professor");
     })
     socket.on(quizSessionID.value + "response", (data) => {
-      console.log(data);
+      tallyResponse(data);
     })
 
     socket.emit("nextQuestion", {
@@ -46,6 +46,7 @@ async function grabQuestions() {
       }));
     })
     .catch((error) => {
+      console.log(error);
       console.error("Something Wrong Happened")
     });
 };
@@ -58,6 +59,10 @@ async function grabAnswers(questionID) {
         answerText: newAnswer.answerText,
         isCorrect: newAnswer.isCorrect
       }));
+
+      res.data.forEach(newAnswer => {
+        responseMap.value.set(newAnswer.answerText, 0);
+      });
     })
     .catch((error) => {
       console.error("Something Wrong Happened")
@@ -92,12 +97,27 @@ async function loadNextQuestion() {
   socket.emit("nextQuestion", {
     quizSessionID: quizSessionID.value
   });
+  responseMap.value.clear();
   sendQuestionsAndAnswers();
+}
+
+async function tallyResponse(response) {
+  if(!responseMap.value.has(response.answerText)) {
+    responseMap.value.set(response.answerText, 1);
+  } else {
+    const currentResponseValue = responseMap.value.get(response.answerText);
+    responseMap.value.set(response.answerText,currentResponseValue + 1);
+  }
 }
 
 </script>
 
 <template>
+
+  <p v-for="[response ,value] in Array.from(responseMap)" :response="response">
+    {{ response }} : {{ value }}
+  </p>
+
   <v-card-actions>
     <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">next Question</v-btn>
     <v-btn variant="flat" color="primary" @click="endQuiz()">Finish Quiz</v-btn>
