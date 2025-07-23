@@ -44,19 +44,21 @@ onMounted(async () => {
   }
 });
 
+function activateSnackbar(color, text){
+  snackbar.value.value = true;
+  snackbar.value.color = color;
+  snackbar.value.text = text;
+}
+
 async function deleteItem(id) {
   await QuizSessionServices.deleteQuizSession(id)
     .then(() => {
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "QuizSession Deleted";
+      activateSnackbar("green", "QuizSession Deleted");
       fetchQuizSession()
     })
     .catch((error) => {
       console.error(error);
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = error.response.data.message;
+      activateSnackbar("red", error.response.data.message)
     });
 };
 
@@ -64,15 +66,12 @@ async function updateItem(id, QuizSession) {
   await QuizSessionServices.updateQuizSession(id, QuizSession)
     .then(() => {
       fetchQuizSession()
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "QuizSession Updated";
+      activateSnackbar("green", "QuizSession Update");
       isUpdateItem.value = false;
     })
     .catch((error) => {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = error.response.data.message;
+      console.error(error);
+      activateSnackbar("red", error.response.data.message)
     });
 };
 
@@ -80,15 +79,12 @@ async function addQuizSession(QuizSession) {
   await QuizSessionServices.addQuizSession(myQuizID.value, QuizSession)
     .then(() => {
       fetchQuizSession()
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "QuizSession Added";
+      activateSnackbar("green", "QuizSession Added");
       isUpdateItem.value = false;
     })
     .catch((error) => {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = error.response.data.message;
+      console.error(error);
+      activateSnackbar("red", error.response.data.message)
     });
 };
 
