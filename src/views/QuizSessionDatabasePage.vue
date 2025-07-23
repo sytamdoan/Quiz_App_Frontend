@@ -19,6 +19,7 @@ const snackbar = ref({
   color: "",
   text: "",
 });
+const dateMenu = ref(false);
 
 const filteredData = computed(() => {
   let data = QuizSession.value;
@@ -131,22 +132,22 @@ function closeSnackBar() {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="QuizSession in filteredData" :key="QuizSession.id" class="mb-2">
-        <td class = "cursor-pointer" @click="openUpdateItem(QuizSession, false)">{{ QuizSession.id }}</td>
-        <td class = "cursor-pointer" @click="openUpdateItem(QuizSession, false)">{{ QuizSession.entryCode }}</td>
-        <td class = "cursor-pointer" @click="openUpdateItem(QuizSession, false)">{{ QuizSession.isActive }}</td>
-        <td class = "cursor-pointer" @click="openUpdateItem(QuizSession, false)">{{ QuizSession.expirationDate }}</td>
+      <tr v-for="item in filteredData" :key="item.id" class="mb-2">
+        <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.id }}</td>
+        <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.entryCode }}</td>
+        <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.isActive }}</td>
+        <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.expirationDate }}</td>
         <td>
-          <v-icon color="red" class="cursor-pointer" @click="openUpdateItem(QuizSession, false)"> mdi-pencil </v-icon>
+          <v-icon color="red" class="cursor-pointer" @click="openUpdateItem(item, false)"> mdi-pencil </v-icon>
           |
-          <v-icon color="red" class="cursor-pointer" @click="deleteItem(QuizSession.id)"> mdi-delete </v-icon>
+          <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
       </tr>
     </tbody>
   </v-table>
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openUpdateItem(QuizSession, true)">Add {{itemName}}</v-btn>
+    <v-btn variant="flat" color="primary" @click="openUpdateItem(item, true)">Add {{itemName}}</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
@@ -168,25 +169,34 @@ function closeSnackBar() {
           <v-radio label = "Inactive" :value="false" />
         </v-radio-group>
 
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            v-model="selectedItem.expirationDate"
-            label="Expiration Date"
-            readonly
-            v-on="on"
-            v-bind="attrs"
-            @click="dateMenu = true"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="selectedItem.expirationDate"
-          scrollable
-          :show-current="true"
+        <v-menu
+          v-model="dateMenu"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-y
+          max-width="290px"
+          min-width="auto"
         >
-          <template v-slot:actions>
-            <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="selectedItem.expirationDate"
+              label="Expiration Date"
+              readonly
+              v-on="on"
+              v-bind="attrs"
+              @click="dateMenu = true"
+            ></v-text-field>
           </template>
-        </v-date-picker>
+          <v-date-picker
+            v-model="selectedItem.expirationDate"
+            scrollable
+            :show-current="true"
+          >
+            <template v-slot:actions>
+              <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
+            </template>
+          </v-date-picker>
+        </v-menu>
 
       </v-card-text>
       <v-card-actions>
