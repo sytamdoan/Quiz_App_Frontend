@@ -53,6 +53,16 @@ const router = createRouter({
       name: "UserDatabasePage",
       component: () => import("./views/UserDatabasePage.vue"),
     },
+    {
+      path: "/StudentQuestion",
+      name: "StudentQuestion",
+      component: () => import("./views/StudentQuestion.vue"),
+    },
+    {
+      path: "/ProfessorQuestion",
+      name: "ProfessorQuestion",
+      component: () => import("./views/ProfessorQuestion.vue"),
+    },
   ],
 });
 

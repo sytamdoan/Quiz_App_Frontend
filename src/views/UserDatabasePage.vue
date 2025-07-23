@@ -32,7 +32,7 @@ const filteredData = computed(() => {
 
 onMounted(async () => {
   try {
-    fetchUsers()
+    fetchUsers();
   } catch (error) {
     console.error("Cannot Fetch Users: ", error)
   }
