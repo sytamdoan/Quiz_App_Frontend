@@ -11,17 +11,27 @@ const quizID = ref(1);
 const questionSet = ref({})
 const answerSet = ref({})
 const currentQuestion = ref(0)
+const responseMap = ref(new Map());
+const hasNextQuestion = computed(() => {
+  return currentQuestion.value < (questionSet.value.length - 1);
+});
 
 onMounted(async () => {
   try {
     socket.on("connect", () => {
       console.log("Connnected To Backend From Professor");
     })
+    socket.on(quizSessionID.value + "response", (data) => {
+      console.log(data);
+    })
+
+    socket.emit("nextQuestion", {
+      quizSessionID: quizSessionID.value
+    });
     await grabQuestions();
     sendQuestionsAndAnswers();
 
   } catch (error) {
-    console.log(error);
     console.error("Something Wrong Happened")
   }
 });
@@ -79,6 +89,9 @@ async function sendQuestionsAndAnswers() {
 
 async function loadNextQuestion() {
   currentQuestion.value += 1;
+  socket.emit("nextQuestion", {
+    quizSessionID: quizSessionID.value
+  });
   sendQuestionsAndAnswers();
 }
 
@@ -86,6 +99,7 @@ async function loadNextQuestion() {
 
 <template>
   <v-card-actions>
-    <v-btn variant="flat" color="primary" @click="loadNextQuestion()">next Question</v-btn>
+    <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">next Question</v-btn>
+    <v-btn variant="flat" color="primary" @click="endQuiz()">Finish Quiz</v-btn>
   </v-card-actions>
 </template>
