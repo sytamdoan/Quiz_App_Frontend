@@ -5,6 +5,7 @@ import { ref, computed } from "vue";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
 
+const itemName = "Quiz Session";
 const QuizSession = ref([])
 const route = useRoute();
 const router = useRouter();
@@ -40,7 +41,7 @@ onMounted(async () => {
     myQuizID.value = route.params.quizID;
     fetchQuizSession()
   } catch (error) {
-    console.error("Cannot Fetch QuizSessions: ", error)
+    console.error("Cannot Fetch " + itemName + ": ", error)
   }
 });
 
@@ -53,7 +54,7 @@ function activateSnackbar(color, text){
 async function deleteItem(id) {
   await QuizSessionServices.deleteQuizSession(id)
     .then(() => {
-      activateSnackbar("green", "QuizSession Deleted");
+      activateSnackbar("green", itemName + " Deleted");
       fetchQuizSession()
     })
     .catch((error) => {
@@ -66,7 +67,7 @@ async function updateItem(id, QuizSession) {
   await QuizSessionServices.updateQuizSession(id, QuizSession)
     .then(() => {
       fetchQuizSession()
-      activateSnackbar("green", "QuizSession Update");
+      activateSnackbar("green", itemName + " Updated");
       isUpdateItem.value = false;
     })
     .catch((error) => {
@@ -79,7 +80,7 @@ async function addQuizSession(QuizSession) {
   await QuizSessionServices.addQuizSession(myQuizID.value, QuizSession)
     .then(() => {
       fetchQuizSession()
-      activateSnackbar("green", "QuizSession Added");
+      activateSnackbar("green", itemName + " Added");
       isUpdateItem.value = false;
     })
     .catch((error) => {
@@ -114,7 +115,7 @@ function closeSnackBar() {
 </script>
 
 <template>
-  <h1 class="title">QuizSession Database</h1>
+  <h1 class="title">{{itemName}} Database</h1>
   <v-text-field
     v-model="searchQuery"
     label="Search"
@@ -145,7 +146,7 @@ function closeSnackBar() {
   </v-table>
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openUpdateItem(QuizSession, true)">Add QuizSession</v-btn>
+    <v-btn variant="flat" color="primary" @click="openUpdateItem(QuizSession, true)">Add {{itemName}}</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
@@ -197,10 +198,10 @@ function closeSnackBar() {
           >Close</v-btn
         >
         <v-btn v-if="!addItemCheck" variant="flat" color="primary" @click="updateItem(selectedItem.id, selectedItem)"
-          >Update QuizSession</v-btn
+          >Update {{itemName}}</v-btn
         >
         <v-btn v-if="addItemCheck" variant="flat" color="primary" @click="addQuizSession(selectedItem)"
-          >Add QuizSession</v-btn
+          >Add {{itemName}}</v-btn
         >
       </v-card-actions>
     </v-card>
