@@ -2,11 +2,11 @@
 <script setup>
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
-import QuizSessionServices from "../services/QuizSessionServices.js";
+import Services from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
 
 const itemName = "Quiz Session";
-const QuizSession = ref([])
+const Item = ref([])
 const route = useRoute();
 const router = useRouter();
 const myQuizID = ref('')
@@ -22,7 +22,7 @@ const snackbar = ref({
 const dateMenu = ref(false);
 
 const filteredData = computed(() => {
-  let data = QuizSession.value;
+  let data = Item.value;
   let keyword = searchQuery.value.toLowerCase();
   if (keyword) {
     data = data.filter((row) => {
@@ -40,7 +40,7 @@ const filteredData = computed(() => {
 onMounted(async () => {
   try {
     myQuizID.value = route.params.quizID;
-    fetchQuizSession()
+    fetchItems()
   } catch (error) {
     console.error("Cannot Fetch " + itemName + ": ", error)
   }
@@ -53,10 +53,10 @@ function activateSnackbar(color, text){
 }
 
 async function deleteItem(id) {
-  await QuizSessionServices.deleteQuizSession(id)
+  await Services.deleteItem(id)
     .then(() => {
       activateSnackbar("green", itemName + " Deleted");
-      fetchQuizSession()
+      fetchItems()
     })
     .catch((error) => {
       console.error(error);
@@ -64,10 +64,10 @@ async function deleteItem(id) {
     });
 };
 
-async function updateItem(id, QuizSession) {
-  await QuizSessionServices.updateQuizSession(id, QuizSession)
+async function updateItem(id, itemData) {
+  await Services.updateItem(id, itemData)
     .then(() => {
-      fetchQuizSession()
+      fetchItems()
       activateSnackbar("green", itemName + " Updated");
       isUpdateItem.value = false;
     })
@@ -77,10 +77,10 @@ async function updateItem(id, QuizSession) {
     });
 };
 
-async function addQuizSession(QuizSession) {
-  await QuizSessionServices.addQuizSession(myQuizID.value, QuizSession)
+async function addItem(Item) {
+  await Services.addItem(myQuizID.value, Item)
     .then(() => {
-      fetchQuizSession()
+      fetchItems()
       activateSnackbar("green", itemName + " Added");
       isUpdateItem.value = false;
     })
@@ -90,17 +90,17 @@ async function addQuizSession(QuizSession) {
     });
 };
 
-async function fetchQuizSession() {
-  const response = await QuizSessionServices.getQuizSession(myQuizID.value)
-  QuizSession.value = response.data
+async function fetchItems() {
+  const response = await Services.getItems(myQuizID.value)
+  Item.value = response.data
 }
 
-function openUpdateItem(QuizSession, addQuizSession) {
-  addItemCheck.value = addQuizSession;
-    if(addItemCheck.value) {
+function openUpdateItem(Item, itemData) {
+  addItemCheck.value = itemData;
+  if(addItemCheck.value) {
     selectedItem.value = {};
   } else {
-    selectedItem.value = {...QuizSession}
+    selectedItem.value = {...Item}
   }
   isUpdateItem.value = true;
 }
@@ -152,7 +152,7 @@ function closeSnackBar() {
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Update QuizSession</v-card-title>
+      <v-card-title class="headline mb-2">Update {{itemName}}</v-card-title>
       <v-card-text>
         <v-text-field
           v-model="selectedItem.entryCode"
@@ -182,7 +182,6 @@ function closeSnackBar() {
               v-model="selectedItem.expirationDate"
               label="Expiration Date"
               readonly
-              v-on="on"
               v-bind="attrs"
               @click="dateMenu = true"
             ></v-text-field>
@@ -210,7 +209,7 @@ function closeSnackBar() {
         <v-btn v-if="!addItemCheck" variant="flat" color="primary" @click="updateItem(selectedItem.id, selectedItem)"
           >Update {{itemName}}</v-btn
         >
-        <v-btn v-if="addItemCheck" variant="flat" color="primary" @click="addQuizSession(selectedItem)"
+        <v-btn v-if="addItemCheck" variant="flat" color="primary" @click="addItem(selectedItem)"
           >Add {{itemName}}</v-btn
         >
       </v-card-actions>

@@ -1,16 +1,16 @@
 import apiClient from "./services";
 
 export default {
-  getQuizSession(quizID) {
+  getItems(quizID) {
     return apiClient.get("/Quiz/" + quizID + "/QuizSession/");
   },
-  addQuizSession(quizID, QuizSession) {
+  addItem(quizID, QuizSession) {
     return apiClient.post("/Quiz/" + quizID + "/QuizSession/", QuizSession);
   },
-  updateQuizSession(QuizSessionID, QuizSession) {
+  updateItem(QuizSessionID, QuizSession) {
     return apiClient.put("/QuizSession/" + QuizSessionID, QuizSession);
   },
-  deleteQuizSession(QuizSessionID) {
+  deleteItem(QuizSessionID) {
     return apiClient.delete("/QuizSession/" + QuizSessionID)
   }
 };
