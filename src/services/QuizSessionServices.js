@@ -12,5 +12,11 @@ export default {
   },
   deleteItem(QuizSessionID) {
     return apiClient.delete("/QuizSession/" + QuizSessionID)
-  }
+  },
+  getQuizSession(sessionId) {
+    return apiClient.get("/QuizSession/" + sessionId);
+  },
+  addQuizSession(QuizSession) {
+    return apiClient.post("/QuizSession/", QuizSession);
+  },
 };
