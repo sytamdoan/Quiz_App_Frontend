@@ -4,9 +4,11 @@ import { io } from 'socket.io-client';
 import { ref, computed  } from "vue";
 import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
+import { useRoute } from "vue-router";
 
 const socket = io('http://localhost:3001');
-const quizSessionID = ref(1);
+const route = useRoute();
+const quizSessionID = ref('');
 const quizID = ref(1);
 const questionSet = ref({})
 const answerSet = ref({})
@@ -17,6 +19,11 @@ const hasNextQuestion = computed(() => {
 });
 
 onMounted(async () => {
+  try {
+    quizSessionID.value = route.params.quizSessionID;
+  } catch (error) {
+    console.error("Cannot Fetch QuizSessionId: ", error)
+  }
   try {
     socket.on("connect", () => {
       console.log("Connnected To Backend From Professor");
