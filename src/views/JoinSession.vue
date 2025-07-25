@@ -17,20 +17,20 @@ const sessionInfo = ref({
 });
 
 function joinQuizSession() {
-    const isEmptyField = Object.values(sessionInfo.value).some(
-        (value) => value === null || value === '' || value === undefined
-    );
+  const isEmptyField = Object.values(sessionInfo.value).some(
+      (value) => value === null || value === '' || value === undefined
+  );
 
-    if (isEmptyField) {
-        snackbar.value.value = true;
-        snackbar.value.color = "red";
-        snackbar.value.text = "All fields must be filled.";
-        return;
-    } else {
-        snackbar.value.value = true;
-        snackbar.value.color = "green";
-        snackbar.value.text = "This will try to join you to session in the future";
-    }
+  if (isEmptyField) {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "All fields must be filled.";
+      return;
+  } else {
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "This will try to join you to session in the future";
+  }
 }
 
 function closeSnackBar() {

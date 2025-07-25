@@ -3,6 +3,8 @@ import { onMounted } from 'vue'
 import { io } from 'socket.io-client';
 import { ref, computed  } from "vue";
 import { useRouter } from "vue-router";
+import QuizSessionServices from "../services/QuizSessionServices.js";
+
 
 const socket = io('http://localhost:3001');
 const router = useRouter();
