@@ -1,10 +1,10 @@
 import apiClient from "./services";
 
 export default {
-  getQuiz(sessionId) {
+  getQuizSession(sessionId) {
     return apiClient.get("/QuizSession/" + sessionId);
   },
-  addQuiz(QuizSession) {
+  addQuizSession(QuizSession) {
     return apiClient.post("/QuizSession/", QuizSession);
   },
 };

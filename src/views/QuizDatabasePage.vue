@@ -127,7 +127,7 @@ async function startQuiz(Quiz) {
     quizId:Quiz.id,
     isActive: true,
   };
-  await QuizSessionServices.addQuiz(quizSession)
+  await QuizSessionServices.addQuizSession(quizSession)
     .then((response) => {
       fetchQuiz()
       snackbar.value.value = true;
