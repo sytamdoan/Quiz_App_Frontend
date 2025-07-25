@@ -59,7 +59,7 @@ const router = createRouter({
       component: () => import("./views/UserDatabasePage.vue"),
     },
     {
-      path: "/StudentQuestion",
+      path: "/StudentQuestion/:quizSessionID",
       name: "StudentQuestion",
       component: () => import("./views/StudentQuestion.vue"),
     },
@@ -74,9 +74,14 @@ const router = createRouter({
       component: () => import("./views/ProfessorWaitingPage.vue"),
     },
     {
-      path: "/ProfessorEndQuizPage",
+      path: "/ProfessorEndQuizPage/",
       name: "ProfessorEndQuizPage",
       component: () => import("./views/ProfessorEndQuizPage.vue"),
+    },
+    {
+      path: "/StudentEndQuizPage/",
+      name: "StudentEndQuizPage",
+      component: () => import("./views/StudentEndQuizPage.vue"),
     },
   ],
 });

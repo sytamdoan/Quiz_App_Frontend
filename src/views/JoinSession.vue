@@ -3,6 +3,8 @@ import { onMounted } from "vue";
 import { ref, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import UserServices from "../services/UserServices.js";
+import QuizSessionServices from "../services/QuizSessionServices.js";
+
 
 const confirmPassword = ref('')
 const router = useRouter();
@@ -12,8 +14,9 @@ const snackbar = ref({
   color: "",
   text: "",
 });
+const sessionID = ref("")
 const sessionInfo = ref({
-  sessionId: "",
+  sessionEntryCode: "",
 });
 
 function joinQuizSession() {
@@ -31,6 +34,21 @@ function joinQuizSession() {
       snackbar.value.color = "green";
       snackbar.value.text = "This will try to join you to session in the future";
   }
+  findSession();
+}
+
+async function findSession() {
+  await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
+  .then((res) => {
+      sessionID.value = res.data.id;
+      console.log("Quiz Session Grabbed")
+      router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
+
+  })
+  .catch((error) => {
+      console.log(error);
+      console.error("Something Wrong Happened")
+  });
 }
 
 function closeSnackBar() {
@@ -46,8 +64,8 @@ function closeSnackBar() {
         <v-card-title class="headline mb-2">Join Session </v-card-title>
         <v-card-text>
           <v-text-field
-            v-model="sessionInfo.sessionId"
-            label="Session ID"
+            v-model="sessionInfo.sessionEntryCode"
+            label="Session Code"
             required
           ></v-text-field>
 

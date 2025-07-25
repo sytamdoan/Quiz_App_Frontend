@@ -22,4 +22,7 @@ export default {
   endQuizSession(QuizSession) {
     return apiClient.put("/QuizSession/" + QuizSession);
   },
+  findQuizSession(QuizSession) {
+    return apiClient.get("/QuizSession/EntryCode/" + QuizSession);
+  },
 };

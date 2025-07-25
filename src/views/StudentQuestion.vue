@@ -2,13 +2,14 @@
 import { onMounted } from 'vue'
 import { io } from 'socket.io-client';
 import { ref, computed  } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 
 
 const socket = io('http://localhost:3001');
 const router = useRouter();
-const quizSessionID = ref(3);
+const route = useRoute();
+const quizSessionID = ref(0);
 const currentQuestion = ref("");
 const answerSet = ref({})
 const selectedAnswer = ref();
@@ -22,6 +23,8 @@ const snackbar = ref({
 
 onMounted(async () => {
   try {
+    quizSessionID.value = route.params.quizSessionID;
+    console.log(route.params.quizSessionID);
     socket.on("connect", () => {
       console.log("Connnected To Backend From Student Side");
     })
@@ -31,12 +34,16 @@ onMounted(async () => {
     socket.on(quizSessionID.value + "answer", (data) => {
       answerSet.value = data;
     })
+    socket.on(quizSessionID.value + "end", (data) => {
+      router.push({ name: "StudentEndQuizPage" });
+    })
     socket.on(quizSessionID.value + "nextQuestion", (data) => {
       waitingForNextQuestion.value = false;
       selectedAnswer.value = null;
     })
 
   } catch (error) {
+    console.log(error)
     console.error("Something went wrong")
   }
 });
