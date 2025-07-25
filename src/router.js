@@ -59,7 +59,7 @@ const router = createRouter({
       component: () => import("./views/StudentQuestion.vue"),
     },
     {
-      path: "/ProfessorQuestion",
+      path: "/ProfessorQuestion/:quizSessionID",
       name: "ProfessorQuestion",
       component: () => import("./views/ProfessorQuestion.vue"),
     },

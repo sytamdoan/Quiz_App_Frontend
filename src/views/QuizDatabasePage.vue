@@ -3,6 +3,7 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import QuizServices from "../services/QuizServices.js";
+import QuizSessionServices from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
 
 const Quiz = ref([])
@@ -121,6 +122,25 @@ function closeSnackBar() {
 function goToQuestionPage(QuizID) {
   router.push({ name: "QuestionDatabasePage", params: {quizID: QuizID} });
 }
+async function startQuiz(Quiz) {
+  let quizSession = {
+    quizId:Quiz.id,
+    isActive: true,
+  };
+  await QuizSessionServices.addQuizSession(quizSession)
+    .then((response) => {
+      fetchQuiz()
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "Quiz Session Started";
+      router.push({ name: "ProfessorQuestion", params: {quizSessionID: response.data.id} });
+    })
+    .catch((error) => {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = error.response.data.message;
+    });
+};
 </script>
 
 <template>
@@ -148,6 +168,8 @@ function goToQuestionPage(QuizID) {
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.subject }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.timeLimit }}</td>
         <td>
+          <v-icon color="red" class="cursor-pointer" @click="startQuiz(Quiz)"> mdi-timer </v-icon>
+          |
           <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuiz(Quiz, false)"> mdi-pencil </v-icon>
