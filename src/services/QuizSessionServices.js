@@ -7,4 +7,7 @@ export default {
   addQuizSession(QuizSession) {
     return apiClient.post("/QuizSession/", QuizSession);
   },
+  endQuizSession(QuizSession) {
+    return apiClient.put("/QuizSession/" + QuizSession);
+  },
 };

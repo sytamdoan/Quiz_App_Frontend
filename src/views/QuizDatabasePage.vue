@@ -133,7 +133,7 @@ async function startQuiz(Quiz) {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Quiz Session Started";
-      router.push({ name: "ProfessorQuestion", params: {quizSessionID: response.data.id} });
+      router.push({ name: "ProfessorWaitingPage", params: {quizSessionID: response.data.id} });
     })
     .catch((error) => {
       snackbar.value.value = true;

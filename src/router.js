@@ -63,6 +63,16 @@ const router = createRouter({
       name: "ProfessorQuestion",
       component: () => import("./views/ProfessorQuestion.vue"),
     },
+    {
+      path: "/ProfessorWaitingPage/:quizSessionID",
+      name: "ProfessorWaitingPage",
+      component: () => import("./views/ProfessorWaitingPage.vue"),
+    },
+    {
+      path: "/ProfessorEndQuizPage",
+      name: "ProfessorEndQuizPage",
+      component: () => import("./views/ProfessorEndQuizPage.vue"),
+    },
   ],
 });
 
