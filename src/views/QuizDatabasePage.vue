@@ -122,6 +122,11 @@ function closeSnackBar() {
 function goToQuestionPage(QuizID) {
   router.push({ name: "QuestionDatabasePage", params: {quizID: QuizID} });
 }
+
+function goToQuizSessionsPage(QuizID) {
+  router.push({ name: "QuizSessionDatabasePage", params: {quizID: QuizID} });
+}
+
 async function startQuiz(Quiz) {
   let quizSession = {
     quizId:Quiz.id,
@@ -171,6 +176,8 @@ async function startQuiz(Quiz) {
           <v-icon color="red" class="cursor-pointer" @click="startQuiz(Quiz)"> mdi-timer </v-icon>
           |
           <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
+          |
+          <a @click="goToQuizSessionsPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Sessions</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuiz(Quiz, false)"> mdi-pencil </v-icon>
           |
