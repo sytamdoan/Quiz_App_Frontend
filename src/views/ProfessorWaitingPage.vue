@@ -27,6 +27,7 @@ async function grabQuizSession() {
         console.log("Quiz Session Entry Code Grabbed")
     })
     .catch((error) => {
+        console.log(error);
         console.error("Something Wrong Happened")
     });
 };
