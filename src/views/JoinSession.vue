@@ -29,10 +29,6 @@ function joinQuizSession() {
       snackbar.value.color = "red";
       snackbar.value.text = "All fields must be filled.";
       return;
-  } else {
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "This will try to join you to session in the future";
   }
   findSession();
 }
@@ -40,14 +36,13 @@ function joinQuizSession() {
 async function findSession() {
   await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
   .then((res) => {
-      sessionID.value = res.data.id;
-      console.log("Quiz Session Grabbed")
-      router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
+    sessionID.value = res.data.id;
+    console.log("Quiz Session Grabbed")
+    router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
 
   })
   .catch((error) => {
-      console.log(error);
-      console.error("Something Wrong Happened")
+      console.error("Quiz Session Doesn't Exist")
   });
 }
 
