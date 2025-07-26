@@ -5,10 +5,11 @@ import { ref, computed  } from "vue";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const socket = io('http://localhost:3001');
 const route = useRoute();
+const router = useRouter();
 const quizSessionID = ref('');
 const quizID = ref('');
 const questionSet = ref({})
@@ -114,6 +115,18 @@ async function loadNextQuestion() {
     quizSessionID: quizSessionID.value
   });
   sendQuestionsAndAnswers();
+}
+
+async function endQuiz() {
+  await QuizSessionServices.endQuizSession(quizSessionID.value)
+    .then((res) => {
+      console.log("Quiz has ended")
+      router.push({ name: "ProfessorEndQuizPage"});
+    })
+    .catch((error) => {
+      console.log(error);
+      console.error("Something Wrong Happened")
+    });
 }
 
 </script>

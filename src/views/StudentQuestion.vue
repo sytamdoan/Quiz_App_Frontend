@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 
 const socket = io('http://localhost:3001');
 const router = useRouter();
-const quizSessionID = ref(1);
+const quizSessionID = ref(3);
 const currentQuestion = ref("");
 const answerSet = ref({})
 const selectedAnswer = ref();
