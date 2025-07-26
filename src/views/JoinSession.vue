@@ -3,6 +3,8 @@ import { onMounted } from "vue";
 import { ref, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import UserServices from "../services/UserServices.js";
+import QuizSessionServices from "../services/QuizSessionServices.js";
+
 
 const confirmPassword = ref('')
 const router = useRouter();
@@ -12,25 +14,39 @@ const snackbar = ref({
   color: "",
   text: "",
 });
+const sessionID = ref("")
 const sessionInfo = ref({
-  sessionId: "",
+  sessionEntryCode: "",
 });
 
 function joinQuizSession() {
-    const isEmptyField = Object.values(sessionInfo.value).some(
-        (value) => value === null || value === '' || value === undefined
-    );
+  const isEmptyField = Object.values(sessionInfo.value).some(
+      (value) => value === null || value === '' || value === undefined
+  );
 
-    if (isEmptyField) {
-        snackbar.value.value = true;
-        snackbar.value.color = "red";
-        snackbar.value.text = "All fields must be filled.";
-        return;
-    } else {
-        snackbar.value.value = true;
-        snackbar.value.color = "green";
-        snackbar.value.text = "This will try to join you to session in the future";
-    }
+  if (isEmptyField) {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "All fields must be filled.";
+      return;
+  }
+  findSession();
+}
+
+async function findSession() {
+  await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
+  .then((res) => {
+    sessionID.value = res.data.id;
+    console.log("Quiz Session Grabbed")
+    router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
+
+  })
+  .catch((error) => {
+    snackbar.value.value = true;
+    snackbar.value.color = "red";
+    snackbar.value.text = "Invalid code.";
+    console.error("Quiz Session Doesn't Exist")
+  });
 }
 
 function closeSnackBar() {
@@ -46,8 +62,8 @@ function closeSnackBar() {
         <v-card-title class="headline mb-2">Join Session </v-card-title>
         <v-card-text>
           <v-text-field
-            v-model="sessionInfo.sessionId"
-            label="Session ID"
+            v-model="sessionInfo.sessionEntryCode"
+            label="Session Code"
             required
           ></v-text-field>
 

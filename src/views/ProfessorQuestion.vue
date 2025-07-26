@@ -121,6 +121,9 @@ async function endQuiz() {
   await QuizSessionServices.endQuizSession(quizSessionID.value)
     .then((res) => {
       console.log("Quiz has ended")
+      socket.emit("end", {
+        quizSessionID: quizSessionID.value
+      });
       router.push({ name: "ProfessorEndQuizPage"});
     })
     .catch((error) => {

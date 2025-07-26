@@ -20,6 +20,9 @@ export default {
     return apiClient.post("/QuizSession/", QuizSession);
   },
   endQuizSession(QuizSession) {
-    return apiClient.put("/QuizSession/" + QuizSession);
+    return apiClient.put("/QuizSession/EndSession/" + QuizSession);
+  },
+  findQuizSession(QuizSession) {
+    return apiClient.get("/QuizSession/EntryCode/" + QuizSession);
   },
 };
