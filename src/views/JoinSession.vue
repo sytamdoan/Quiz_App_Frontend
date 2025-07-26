@@ -42,6 +42,9 @@ async function findSession() {
 
   })
   .catch((error) => {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "Invalid code.";
       console.error("Quiz Session Doesn't Exist")
   });
 }
