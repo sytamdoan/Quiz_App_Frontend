@@ -15,7 +15,6 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "roboto-fontface": "*",
-    "socket.io": "^4.8.1",
     "socket.io-client": "^4.5.4",
     "vue": "^3.2.41",
     "vue-router": "^4.1.6",
