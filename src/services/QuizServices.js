@@ -12,5 +12,8 @@ export default {
   },
   deleteQuiz(QuizID) {
     return apiClient.delete("/Quiz/" + QuizID)
+  },
+  duplicateQuiz(quizId) {
+  return apiClient.post("/Quiz/" + quizId + "/duplicate");
   }
 };

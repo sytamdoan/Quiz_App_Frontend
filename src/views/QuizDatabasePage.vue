@@ -111,6 +111,16 @@ function openUpdateQuiz(Quiz, addQuiz) {
   isUpdateQuiz.value = true;
 }
 
+async function duplicateQuiz(Quiz){
+  try {
+    const response = await QuizServices.duplicateQuiz(Quiz.id);
+    console.log("Quiz duplicated", response.data);
+    await fetchQuiz();
+  } catch (err) {
+    console.error("Error duplicating quiz", err);
+  }
+};
+
 function closeUpdateQuiz() {
   isUpdateQuiz.value = false;
 }
@@ -180,6 +190,19 @@ async function startQuiz(Quiz) {
           <a @click="goToQuizSessionsPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Sessions</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuiz(Quiz, false)"> mdi-pencil </v-icon>
+          |
+          <v-tooltip text="Duplicate Quiz" location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                color="red"
+                class="cursor-pointer"
+                @click="duplicateQuiz(Quiz)"
+              >
+                mdi-content-duplicate
+              </v-icon>
+            </template>
+          </v-tooltip>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteQuiz(Quiz.id)"> mdi-delete </v-icon>
         </td>
