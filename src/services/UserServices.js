@@ -1,6 +1,9 @@
 import apiClient from "./services";
 
 export default {
+  getUserNames(id) {
+    return apiClient.get("usernames/" + id)
+  },
   getUser() {
     return apiClient.get("users");
   },
