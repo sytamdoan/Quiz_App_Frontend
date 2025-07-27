@@ -5,8 +5,9 @@ import { ref, computed } from "vue";
 import Services from "../services/ResponseServices.js";
 import { useRoute, useRouter } from "vue-router";
 
+// For swapping IDs with readable data
 import UserServices from "../services/UserServices.js"
-import QuestionServices from "../services/QuizServices.js"
+import QuestionServices from "../services/QuestionServices.js"
 import AnswerServices from '../services/AnswerServices.js';
 
 const itemName = "Response";
@@ -24,6 +25,11 @@ const snackbar = ref({
   text: "",
 });
 
+// For swapping IDs with readable data
+const userData = ref([]);
+const questionData = ref([]);
+const answerData = ref([]);
+
 const filteredData = computed(() => {
   let data = Item.value;
   let keyword = searchQuery.value.toLowerCase();
@@ -31,10 +37,9 @@ const filteredData = computed(() => {
     data = data.filter((row) => {
       return (
         String(row.id).toLowerCase().includes(keyword) ||
-        String(row.quizSessionId).toLowerCase().includes(keyword) ||
-        String(row.questionId).toLowerCase().includes(keyword) ||
-        String(row.answerId).toLowerCase().includes(keyword) ||
-        String(row.userId).toLowerCase().includes(keyword)
+        String(row.questionText).toLowerCase().includes(keyword) ||
+        String(row.answerText).toLowerCase().includes(keyword) ||
+        String(row.userNames).toLowerCase().includes(keyword)
       );
     });
   }
@@ -69,6 +74,7 @@ async function deleteItem(id) {
 };
 
 async function addItem(Item) {
+  Item.quizSessionId = quizSessionId
   await Services.addItem(Item)
     .then(() => {
       fetchItems()
@@ -83,7 +89,44 @@ async function addItem(Item) {
 
 async function fetchItems() {
   const response = await Services.getItems(quizSessionId.value)
-  Item.value = response.data
+  console.log(response);
+  // Swap IDs for readable data
+  const swapped = await Promise.all(
+    response.data.map(async (i) => {
+      let userNames = "";
+      let questionText = "";
+      let answerText = "";
+
+      // Get the user's first and last name
+      if (i.userId !== null) {
+        const res = await UserServices.getUserNames(i.userId)
+        userNames = res.data.firstName + " " + res.data.lastName
+      }
+      
+      // Get the question text
+      if (i.questionId !== null) {
+        const res = await QuestionServices.getOneQuestion(i.questionId)
+        console.log(res)
+        questionText = res.data.questionText
+      }
+
+      // Get the answer text
+      if (i.answerId !== null) {
+        const res = await AnswerServices.getOneAnswer(i.answerId)
+        answerText = res.data.answerText
+      }
+      
+      return {
+        ...i,
+        userNames,
+        questionText,
+        answerText
+      }
+
+    })
+  );
+
+  Item.value = swapped;
 }
 
 function openAddMenu(Item) {
@@ -112,17 +155,17 @@ function closeSnackBar() {
     <thead>
       <tr>
         <th class="text-left">ID</th>
-        <th class="text-left">questionId</th>
-        <th class="text-left">answerId</th>
-        <th class="text-left">userId</th>
+        <th class="text-left">[id]. Question</th>
+        <th class="text-left">[id]. Answer</th>
+        <th class="text-left">[id]. User</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="item in filteredData" :key="item.id" class="mb-2">
         <td class="cursor-pointer">{{ item.id }}</td>
-        <td class="cursor-pointer">{{ item.questionId }}</td>
-        <td class="cursor-pointer">{{ item.answerId }}</td>
-        <td class="cursor-pointer">{{ getUserNames(item.userId) || 'Loading..' }}</td>
+        <td class="cursor-pointer">[{{ item.questionId }}]. {{ item.questionText }}</td>
+        <td class="cursor-pointer">[{{ item.answerId }}]. {{ item.answerText }}</td>
+        <td class="cursor-pointer">[{{ item.userId }}]. {{ item.userNames }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
