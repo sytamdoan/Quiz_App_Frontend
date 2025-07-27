@@ -91,6 +91,7 @@ async function fetchItems() {
   const response = await Services.getItems(quizSessionId.value)
   console.log(response);
   // Swap IDs for readable data
+  // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
     response.data.map(async (i) => {
       let userNames = "";
