@@ -5,6 +5,10 @@ import { ref, computed } from "vue";
 import Services from "../services/ResponseServices.js";
 import { useRoute, useRouter } from "vue-router";
 
+import UserServices from "../services/UserServices.js"
+import QuestionServices from "../services/QuizServices.js"
+import AnswerServices from '../services/AnswerServices.js';
+
 const itemName = "Response";
 const Item = ref([])
 const route = useRoute();
@@ -19,7 +23,6 @@ const snackbar = ref({
   color: "",
   text: "",
 });
-const dateMenu = ref(false);
 
 const filteredData = computed(() => {
   let data = Item.value;
@@ -109,7 +112,6 @@ function closeSnackBar() {
     <thead>
       <tr>
         <th class="text-left">ID</th>
-        <th class="text-left">quizSessionId</th>
         <th class="text-left">questionId</th>
         <th class="text-left">answerId</th>
         <th class="text-left">userId</th>
@@ -118,10 +120,9 @@ function closeSnackBar() {
     <tbody>
       <tr v-for="item in filteredData" :key="item.id" class="mb-2">
         <td class="cursor-pointer">{{ item.id }}</td>
-        <td class="cursor-pointer">{{ item.quizSessionId }}</td>
         <td class="cursor-pointer">{{ item.questionId }}</td>
         <td class="cursor-pointer">{{ item.answerId }}</td>
-        <td class="cursor-pointer">{{ item.userId }}</td>
+        <td class="cursor-pointer">{{ getUserNames(item.userId) || 'Loading..' }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
@@ -138,9 +139,9 @@ function closeSnackBar() {
       <v-card-title class="headline mb-2">Update {{itemName}}</v-card-title>
       <v-card-text>
         <v-text-field
-          v-model="selectedItem.quizSessionId"
+          v-model="quizSessionId"
           label="QuizSession ID"
-          required
+          readonly
         ></v-text-field>
 
         <v-text-field
