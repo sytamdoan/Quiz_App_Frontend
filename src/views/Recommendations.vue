@@ -1,68 +1,129 @@
 <script setup>
 import { onMounted } from 'vue'
 import { ref, computed} from "vue";
+import QuizServices from "../services/QuizServices.js";
+import QuestionServices from "../services/QuestionServices.js";
+import AnswerServices from "../services/AnswerServices.js";
 import LLMServices from "../services/LLMServices.js";
-const recommendedBooks = ref([])
-const isAddRecBook = ref(false);
-const selectedRecommendBook = ref({})
-const selectRecommendBookID = ref(0)
-const statusOptions = ref([]);
-const statusNameInput = ref("");
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+const router = useRouter();
+const generatedQuiz = ref([]);
+const generatedQuestions = ref([])
+const classID = ref('')
 const userData = JSON.parse(localStorage.getItem("user"));
-const pubDateMenu = ref(false);
-const purchDateMenu = ref(false);
-const isWishlist = ref(false);
+const newQuiz = ref({});
 const token = userData.token || "";
+const loaded = ref(false);
 const snackbar = ref({
   value: false,
   color: "",
   text: "",
 });
 
-
-const displayPublicationDate = computed(() => {
-  return selectedRecommendBook.value.book?.publicationDate
-    ? new Date(selectedRecommendBook.value.book.publicationDate).toISOString().slice(0, 10)
-    : '';
-});
-
-const displayPurchaseDate = computed(() => {
-  return selectedRecommendBook.value.dateBought
-    ? new Date(selectedRecommendBook.value.dateBought).toISOString().slice(0, 10)
-    : '';
-});
-
 onMounted(async () => {
   try {
-    getRecommendations()
-
-    statusOptions.value = [
-      { id: 1, statusName: "To Read" },
-      { id: 2, statusName: "Reading" },
-      { id: 3, statusName: "Finished" },
-      { id: 4, statusName: "DNF" }
-    ];
+    classID.value = route.params.classID;
+    //Defaulting new class so that they can work with some data
+    newQuiz.value = {
+      classId: classID.value,
+      name:'Test Quiz',
+      type:'quiz',
+      subject:'Zea mays',
+      timeLimit:1,//Default to 1 minute
+      isResultsVisible:false,
+      isAnonymous:false,
+      isEditable:false
+    }
+    loaded.value = false;
+    generateQuiz.value = {};
   } catch (error) {
     console.error(error)
   }
 });
 //whatever
-function getRecommendations() {
-  fetchOwnedBooks().then(() => {
-    LLMServices.getRecommendations(OwnedBooks.value)
-      .then((response) => {
-        const jsonText = response.data.replace(/```json\n?/, '').replace(/\n?```$/, '');
-        recommendedBooks.value = JSON.parse(jsonText);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  });
+function generateQuiz() {
+  LLMServices.getRecommendations(newQuiz.value)
+    .then((response) => {
+      const jsonText = response.data.slice(response.data.indexOf("```json")).replace(/```json\n?/, '').replace(/\n?```$/, '');
+      //console.log(JSON.parse(jsonText));
+      generatedQuiz.value = JSON.parse(jsonText);
+      generatedQuestions.value = JSON.parse(jsonText);
+      //console.log(generatedQuestions);
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .finally(()=>{
+      console.log("Finished Loading");
+      loaded.value = true;
+    });
 }
 
+function resetForm() {
+  newQuiz.value = newQuiz.value = {
+      classId: classID.value,
+      name:'',
+      type:'quiz',
+      subject:'',
+      timeLimit:1,//Default to 1 minute
+      isResultsVisible:false,
+      isAnonymous:false,
+      isEditable:false
+    }
+  loaded.value = false;
+  generatedQuiz.value = {};
+}
 
-function closeAddRecBook() {
-  isAddRecBook.value = false;
+function addGeneratedData(){
+  console.log(newQuiz.value);
+  //New Quiz Section
+  QuizServices.addQuiz(newQuiz.value.classId, newQuiz.value)
+    .then((quizResponse) => {
+      console.log("here");
+      generatedQuestions.value.questions.forEach(element => {
+        //New Question Section
+        let newQuestion = {
+          quizId: quizResponse.data.id,
+          questionText: element.questionText,
+        }
+        let questionAnswers = element.answers;
+        QuestionServices.addQuestion(newQuestion.quizId,newQuestion)
+        .then((questionResponse)=>{
+          //New Answer Section
+          questionAnswers.forEach(answerElement => {
+              let newAnswer = {
+              questionId: questionResponse.data.id,
+              answerText: answerElement.answerText,
+              isCorrect: answerElement.isCorrect,
+            }
+            AnswerServices.addAnswer(newAnswer.questionId,newAnswer)
+            .catch((answerError)=>{
+              console.log(answerError);
+            });
+          });
+        })
+        .catch((questionError)=>{
+          console.log(questionError);
+        });
+      });
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "Generated Quiz Added";
+      //isUpdateQuiz.value = false;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "Error Adding Generated Quiz";
+    })
+    .finally(()=>{
+    });
+}
+
+function goToClassPage(questionID) {
+  router.push({ name: "AnswerDatabasePage", params: {questionID: questionID} });
 }
 
 function closeSnackBar() {
@@ -71,9 +132,38 @@ function closeSnackBar() {
 </script>
 
 <template>
-  <h1 class="title">Recommendations Page</h1>
+  <h1 class="title">Quiz Generation Page</h1>
+<v-form>
+  <v-text-field
+    v-model="newQuiz.name"
+    label="Quiz Name"
+    required
+  ></v-text-field>
 
-  <v-table>
+  <v-radio-group
+    v-model="newQuiz.type"
+    label="Quiz Type"
+    required
+  >
+    <v-radio label = "Quiz" :value="'quiz'" />
+    <v-radio label = "Poll" :value="'poll'" />
+  </v-radio-group>
+
+  <v-text-field
+    v-model="newQuiz.subject"
+    label="Quiz Subject"
+    required
+  ></v-text-field>
+  
+  <v-btn variant="flat" color="primary" @click="resetForm()"
+    >Reset Form</v-btn
+  >
+
+  <v-btn v-if="newQuiz.subject != '' && newQuiz.name != ''" variant="flat" color="primary" @click="generateQuiz()"
+    >Generate Quiz</v-btn
+  >
+</v-form>
+  <!-- <v-table>
   <thead>
     <tr>
       <th class="text-left">Title</th>
@@ -91,7 +181,7 @@ function closeSnackBar() {
       <v-icon color="red" class="cursor-pointer"> mdi-star </v-icon>
     </tr>
   </tbody>
-  </v-table>
+  </v-table> -->
   <v-snackbar v-model="snackbar.value" rounded="pill">
     {{ snackbar.text }}
     <template v-slot:actions>
@@ -105,150 +195,42 @@ function closeSnackBar() {
     </template>
   </v-snackbar>
 
-  <v-dialog persistent v-model="isAddRecBook" width="800">
+  <v-dialog persistent v-model="loaded">
     <v-card class="rounded-lg elevation-5">
       <v-card-title class="headline mb-2">
-        Book Details
-      </v-card-title>        <v-card-text>
-        <v-text-field
-          v-model="selectedRecommendBook.book.title"
-          label="Title"
-          required
-        ></v-text-field>
+        Generated Quiz
+      </v-card-title>
+      <v-card-text>
+        <v-table>
+          <thead>
+            <tr>
+              <th class="text-left">Question</th>
+              <th class="text-left">Answer 1</th>
+              <th class="text-left">Answer 2</th>
+              <th class="text-left">Answer 3</th>
+              <th class="text-left">Answer 4</th>
 
-        <v-text-field
-          v-model="selectedRecommendBook.author"
-          label="Author"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model="selectedRecommendBook.publisher"
-          label="Publisher"
-          required
-        ></v-text-field>
-
-        <v-menu
-          v-if = "!isWishlist"
-          v-model="pubDateMenu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-          max-width="290px"
-          min-width="auto"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="displayPublicationDate"
-              label="Publication Date"
-              readonly
-              v-on="on"
-              v-bind="attrs"
-              @click="pubDateMenu = true"
-            ></v-text-field>
-          </template>
-
-          <v-date-picker
-            v-model="selectedRecommendBook.book.publicationDate"
-            scrollable
-            :show-current="true"
-            @update:modelValue="pubDateMenu = false"
-          />
-        </v-menu>
-
-        <v-text-field
-          v-if = "isWishlist"
-          v-model="selectedRecommendBook.book.numPages"
-          label="Number of Pages"
-        ></v-text-field>
-
-        <v-text-field
-          v-if = "isWishlist"
-          v-model="selectedRecommendBook.book.link"
-          label="Amazon Link"
-        />
-
-        <v-text-field
-          v-if = "isWishlist"
-          v-model="selectedRecommendBook.paidAmount"
-          label="Purchase Price"
-        ></v-text-field>
-
-        <v-menu
-          v-model="purchDateMenu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-          max-width="290px"
-          min-width="auto"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="displayPurchaseDate"
-              label="Purchase Date"
-              readonly
-              v-on="on"
-              v-bind="attrs"
-              @click="purchDateMenu = true"
-            ></v-text-field>
-          </template>
-
-          <v-date-picker
-            v-model="selectedRecommendBook.dateBought"
-            scrollable
-            :show-current="true"
-            @update:modelValue="purchDateMenu = false"
-          />
-        </v-menu>
-
-        <v-combobox
-          v-if = "!isWishlist"
-          v-model="statusNameInput"
-          :items="statusOptions.map(option => option.statusName)"
-          item-title="statusName"
-          label="Reading Status"
-          clearable
-        />
-
-        <v-textarea
-          v-if = "!isWishlist"
-          v-model="selectedRecommendBook.userNotes"
-          label="Notes"
-          rows="4"
-          auto-grow
-          outlined
-        ></v-textarea>
-
-        <v-number-input control-variant="default"
-          v-if = "!isWishlist"
-          v-model="selectedRecommendBook.bookRating.score"
-          label="Rating (1-10)"
-        ></v-number-input>
-
-        <v-textarea
-          v-if = "!isWishlist"
-          v-model="selectedRecommendBook.bookRating.description"
-          label="Rating Description"
-          rows="4"
-          auto-grow
-          outlined
-        ></v-textarea>
-
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="Item in generatedQuiz.questions" :key="Item.questionText" class="mb-2">
+              <td class = "text-left" >{{ Item.questionText }}</td>
+              <td class = "text-left" >{{ Item.answers[0].answerText }}|{{ Item.answers[0].isCorrect?"Correct Answer":"Incorrect Answer" }} </td>
+              <td class = "text-left" >{{ Item.answers[1].answerText }}|{{ Item.answers[1].isCorrect?"Correct Answer":"Incorrect Answer" }} </td>
+              <td class = "text-left" >{{ Item.answers[2].answerText }}|{{ Item.answers[2].isCorrect?"Correct Answer":"Incorrect Answer" }} </td>
+              <td class = "text-left" >{{ Item.answers[3].answerText }}|{{ Item.answers[3].isCorrect?"Correct Answer":"Incorrect Answer" }} </td>
+            </tr>
+          </tbody>
+        </v-table>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          variant="flat"
-          color="secondary"
-          @click="closeAddRecBook()"
-          >Close</v-btn
+        <v-btn variant="flat" color="primary" @click="addGeneratedData()"
+          >Add Quiz</v-btn
         >
-        <v-btn v-if = "!isWishlist" variant="flat" color="primary" @click="addOwnedBook(selectedRecommendBook, token)"
-          >Add Book</v-btn
-        >
-
-        <v-btn v-if = "isWishlist" variant="flat" color="primary" @click="addItem(selectedRecommendBook)"
-          >Wishlist Book</v-btn
+        <v-spacer/>
+        <v-btn variant="flat" color="primary" @click="resetForm()"
+          >Clear and Restart</v-btn
         >
       </v-card-actions>
     </v-card>
@@ -260,5 +242,8 @@ function closeSnackBar() {
   text-align: center;
   margin: 0.5rem 0;
   font-weight: 600;
+}
+v-dialog{
+ width:80%;
 }
 </style>
