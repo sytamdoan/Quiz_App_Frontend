@@ -14,6 +14,7 @@ const classID = ref('')
 const userData = JSON.parse(localStorage.getItem("user"));
 const newQuiz = ref({});
 const token = userData.token || "";
+const isLoading = ref(false);
 const loaded = ref(false);
 const snackbar = ref({
   value: false,
@@ -43,20 +44,19 @@ onMounted(async () => {
 });
 //whatever
 function generateQuiz() {
+  isLoading.value = true;
   LLMServices.getRecommendations(newQuiz.value)
     .then((response) => {
       const jsonText = response.data.slice(response.data.indexOf("```json")).replace(/```json\n?/, '').replace(/\n?```$/, '');
-      //console.log(JSON.parse(jsonText));
       generatedQuiz.value = JSON.parse(jsonText);
       generatedQuestions.value = JSON.parse(jsonText);
-      //console.log(generatedQuestions);
     })
     .catch((error) => {
       console.log(error);
     })
     .finally(()=>{
-      console.log("Finished Loading");
       loaded.value = true;
+      isLoading.value = false;
     });
 }
 
@@ -136,12 +136,14 @@ function closeSnackBar() {
   <v-text-field
     v-model="newQuiz.name"
     label="Quiz Name"
+    :disabled="isLoading"
     required
   ></v-text-field>
 
   <v-radio-group
     v-model="newQuiz.type"
     label="Quiz Type"
+    :disabled="isLoading"
     required
   >
     <v-radio label = "Quiz" :value="'quiz'" />
@@ -151,16 +153,33 @@ function closeSnackBar() {
   <v-text-field
     v-model="newQuiz.subject"
     label="Quiz Subject"
+    :disabled="isLoading"
     required
   ></v-text-field>
   
-  <v-btn variant="flat" color="primary" @click="resetForm()"
+  <v-btn     
+    :disabled="isLoading"
+    variant="flat"
+    color="primary" 
+    @click="resetForm()"
     >Reset Form</v-btn
   >
 
-  <v-btn v-if="newQuiz.subject != '' && newQuiz.name != ''" variant="flat" color="primary" @click="generateQuiz()"
+  <v-btn v-if="newQuiz.subject != '' && newQuiz.name != '' && !isLoading"
+    :disabled="isLoading.value"
+    variant="flat" 
+    color="primary" 
+    @click="generateQuiz()"
     >Generate Quiz</v-btn
-  >
+    >
+    <div v-if="isLoading">
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+      Generating Quiz. Please Wait...
+    </div>
 </v-form>
   <!-- <v-table>
   <thead>
