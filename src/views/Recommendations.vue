@@ -27,9 +27,9 @@ onMounted(async () => {
     //Defaulting new class so that they can work with some data
     newQuiz.value = {
       classId: classID.value,
-      name:'Test Quiz',
+      name:'',
       type:'quiz',
-      subject:'Zea mays',
+      subject:'',
       timeLimit:1,//Default to 1 minute
       isResultsVisible:false,
       isAnonymous:false,
@@ -76,11 +76,9 @@ function resetForm() {
 }
 
 function addGeneratedData(){
-  console.log(newQuiz.value);
   //New Quiz Section
   QuizServices.addQuiz(newQuiz.value.classId, newQuiz.value)
     .then((quizResponse) => {
-      console.log("here");
       generatedQuestions.value.questions.forEach(element => {
         //New Question Section
         let newQuestion = {
@@ -119,11 +117,12 @@ function addGeneratedData(){
       snackbar.value.text = "Error Adding Generated Quiz";
     })
     .finally(()=>{
+      goToQuizPage();
     });
 }
 
-function goToClassPage(questionID) {
-  router.push({ name: "AnswerDatabasePage", params: {questionID: questionID} });
+function goToQuizPage() {
+  router.push({ name: "QuizDatabasePage", params: {classID: classID.value} });
 }
 
 function closeSnackBar() {
@@ -228,7 +227,6 @@ function closeSnackBar() {
         <v-btn variant="flat" color="primary" @click="addGeneratedData()"
           >Add Quiz</v-btn
         >
-        <v-spacer/>
         <v-btn variant="flat" color="primary" @click="resetForm()"
           >Clear and Restart</v-btn
         >
