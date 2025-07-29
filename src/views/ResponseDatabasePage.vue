@@ -74,7 +74,7 @@ async function deleteItem(id) {
 };
 
 async function addItem(Item) {
-  Item.quizSessionId = quizSessionId
+  Item.quizSessionId = quizSessionId.value
   await Services.addItem(Item)
     .then(() => {
       fetchItems()
@@ -88,7 +88,10 @@ async function addItem(Item) {
 };
 
 async function fetchItems() {
-  const response = await Services.getItems(quizSessionId.value)
+  const filter = {
+    quizSessionId: quizSessionId.value
+  }
+  const response = await Services.getItems(filter)
   // Swap IDs for readable data
   // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
@@ -141,16 +144,14 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
-function downloadResponses() {
+async function downloadResponses() {
   activateSnackbar("blue", "Download placeholder.");
-  // Using reference below to create a csv
-  // https://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
-
   // (blank), Question ID, questionId, questionId, questionId
   // (blank), Answer Key, answerIds, answerIds, answerIds
   // score, StudentName, answerId, answerId, answerId
   // score, StudentName, answerId, answerId, answerId
   // score, StudentName, answerId, answerId, answerId
+  // ...
 
   // Get the ids of the questions
   const questionIDs = new Set();
@@ -161,10 +162,19 @@ function downloadResponses() {
   // Get correct answers
   // TODO: Insert new service that gets the list of correct answers for each question
   const answerKeys = {}
-  questionIDs.forEach((item) => {
-    const response = 0 // await QuizServices.getAnswerKey
-    answerKeys[item] = [2, 3, "qID" + item] // response.data.answerIDs
-  })
+  for (const item of questionIDs) {
+    const filter = {
+      questionId: item,
+      isCorrect: 1
+    }
+    const response = await AnswerServices.getAnswersWithFilter(filter)
+      .catch((error) => {
+        console.error(error);
+        activateSnackbar("red", error.response.data.message)
+      });
+    answerKeys[item] = response.data.map(object => object.id) // response.data.answerIDs
+    console.log(answerKeys);
+  }
 
   // Populate table with correct data
   const studentData = {}
@@ -198,8 +208,8 @@ function downloadResponses() {
   Object.keys(studentData).forEach((key) => {
     let student = studentData[key];
     let newStudentRow = [];
-    newStudentRow[0] = student.score;
-    newStudentRow[1] = student.name;
+    newStudentRow.push(student.score);
+    newStudentRow.push(student.name);
     arrQuestionIDs.forEach((questionId, idx) => {
       newStudentRow[idx+2] = student[questionId] || "n/a";
     })
@@ -213,6 +223,9 @@ function downloadResponses() {
 
   csv+= ",Answer Key:,";
   csv+= arrAnswerKeys.join(",") + "\n";
+
+  csv+= "\n"
+  csv+= "Number Correct (/"+arrQuestionIDs.length+"),Student Name,Their Answers by ID\n"
 
   arrStudentData.forEach((row) => {
     csv+=row.join(",") + "\n"
