@@ -10,6 +10,7 @@ const OCTheme = {
   colors: {
     primary: "#80162B",
     secondary: "#E1E1E1",
+    tertiary: "#DDDDDD",
     accent: "#47121D",
     success: "#47121D",
     error: "#EE5044",
