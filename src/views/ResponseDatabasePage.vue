@@ -144,7 +144,6 @@ function closeSnackBar() {
 function downloadResponses() {
   activateSnackbar("blue", "Download placeholder.");
   // Using reference below to create a csv
-  // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
   // https://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
 
   // (blank), Question ID, questionId, questionId, questionId
@@ -161,10 +160,10 @@ function downloadResponses() {
 
   // Get correct answers
   // TODO: Insert new service that gets the list of correct answers for each question
-  const answerKey = {}
+  const answerKeys = {}
   questionIDs.forEach((item) => {
     const response = 0 // await QuizServices.getAnswerKey
-    answerKey[item] = [2] // response.data.answerIDs
+    answerKeys[item] = [2] // response.data.answerIDs
   })
 
   // Populate table with correct data
@@ -183,14 +182,19 @@ function downloadResponses() {
 
     let student = studentData[item.userId];
     student[item.questionId] = item.answerId; // Insert their response
-    if (answerKey[item.questionId].includes(item.answerId))
+    if (answerKeys[item.questionId].includes(item.answerId))
     {
       student.score++;
     }
   })
 
-  // Start creating CSV
-  console.log(studentData)
+  // Start creating CSV starting with questionIDs
+  // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
+  const csv = ",Question IDs:,";
+  csv+= Array.from(questionIDs)
+
+
+  console.log(csv)
 }
 
 </script>
