@@ -89,7 +89,6 @@ async function addItem(Item) {
 
 async function fetchItems() {
   const response = await Services.getItems(quizSessionId.value)
-  console.log(response);
   // Swap IDs for readable data
   // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
@@ -107,7 +106,6 @@ async function fetchItems() {
       // Get the question text
       if (i.questionId !== null) {
         const res = await QuestionServices.getOneQuestion(i.questionId)
-        console.log(res)
         questionText = res.data.questionText
       }
 
@@ -145,6 +143,9 @@ function closeSnackBar() {
 
 function downloadResponses() {
   activateSnackbar("blue", "Download placeholder.");
+  // Using reference below to create a csv
+  // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
+
 }
 
 </script>
@@ -179,7 +180,7 @@ function downloadResponses() {
         <td class="cursor-pointer">{{ item.id }}</td>
         <td class="cursor-pointer">{{ item.questionText }}</td>
         <td class="cursor-pointer">{{ item.answerText }}</td>
-        <td class="cursor-pointer">{{ item.userNames || anonymous }}</td>
+        <td class="cursor-pointer">{{ item.userNames }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
