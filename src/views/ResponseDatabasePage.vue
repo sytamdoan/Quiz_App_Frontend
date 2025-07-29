@@ -143,40 +143,49 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+function downloadResponses() {
+  activateSnackbar("blue", "Download placeholder.");
+}
+
 </script>
 
 <template>
   <h1 class="title">{{itemName}} Database</h1>
+
+  <v-card-actions>
+    <v-spacer></v-spacer>
+    <v-btn variant="flat" color="tertiary" @click="downloadResponses">
+      <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
+    </v-btn>
+    <v-btn variant="flat" color="primary" @click="openAddMenu(item)">Add {{itemName}}</v-btn>
+  </v-card-actions>
   <v-text-field
     v-model="searchQuery"
     label="Search"
     required
   ></v-text-field>
+
   <v-table>
     <thead>
       <tr>
         <th class="text-left">ID</th>
-        <th class="text-left">[id]. Question</th>
-        <th class="text-left">[id]. Answer</th>
-        <th class="text-left">[id]. User</th>
+        <th class="text-left">Question</th>
+        <th class="text-left">Answer</th>
+        <th class="text-left">User</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="item in filteredData" :key="item.id" class="mb-2">
         <td class="cursor-pointer">{{ item.id }}</td>
-        <td class="cursor-pointer">[{{ item.questionId }}]. {{ item.questionText }}</td>
-        <td class="cursor-pointer">[{{ item.answerId }}]. {{ item.answerText }}</td>
-        <td class="cursor-pointer">[{{ item.userId }}]. {{ item.userNames }}</td>
+        <td class="cursor-pointer">{{ item.questionText }}</td>
+        <td class="cursor-pointer">{{ item.answerText }}</td>
+        <td class="cursor-pointer">{{ item.userNames || anonymous }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
       </tr>
     </tbody>
   </v-table>
-  <v-card-actions>
-    <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openAddMenu(item)">Add {{itemName}}</v-btn>
-  </v-card-actions>
 
   <v-dialog persistent v-model="isAddMenu" width="800">
     <v-card class="rounded-lg elevation-5">
