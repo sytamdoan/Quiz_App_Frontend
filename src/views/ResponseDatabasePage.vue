@@ -163,7 +163,7 @@ function downloadResponses() {
   const answerKeys = {}
   questionIDs.forEach((item) => {
     const response = 0 // await QuizServices.getAnswerKey
-    answerKeys[item] = [2] // response.data.answerIDs
+    answerKeys[item] = [2, 3, "qID" + item] // response.data.answerIDs
   })
 
   // Populate table with correct data
@@ -188,13 +188,28 @@ function downloadResponses() {
     }
   })
 
-  // Start creating CSV starting with questionIDs
+  // Convert each piece of data into arrays
+  let arrQuestionIDs = [...questionIDs];
+  let arrAnswerKeys = [];
+  arrQuestionIDs.forEach((questionId, idx) => { // get data for column
+    arrAnswerKeys[idx] = answerKeys[questionId].join(" or ");
+  })
+  let arrStudentData = [];
+  Object.keys(studentData).forEach((key) => {
+    let student = studentData[key];
+    let newStudentRow = [];
+    newStudentRow[0] = student.score;
+    newStudentRow[1] = student.name;
+    arrQuestionIDs.forEach((questionId, idx) => {
+      newStudentRow[idx+2] = student[questionId] || "n/a";
+    })
+
+    arrStudentData.push(newStudentRow);
+  })
+
+  // Start creating CSV
   // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
   const csv = ",Question IDs:,";
-  csv+= Array.from(questionIDs)
-
-
-  console.log(csv)
 }
 
 </script>
