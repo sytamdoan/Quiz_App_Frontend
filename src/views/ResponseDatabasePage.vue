@@ -270,9 +270,9 @@ async function downloadResponses() {
     <tbody>
       <tr v-for="item in filteredData" :key="item.id" class="mb-2">
         <td class="cursor-pointer">{{ item.id }}</td>
-        <td class="cursor-pointer">{{ item.questionText }}</td>
-        <td class="cursor-pointer">{{ item.answerText }}</td>
-        <td class="cursor-pointer">{{ item.userNames }}</td>
+        <td class="cursor-pointer" :title="'id='+item.questionId">{{ item.questionText }}</td>
+        <td class="cursor-pointer" :title="'id='+item.answerId">{{ item.answerText }}</td>
+        <td class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
