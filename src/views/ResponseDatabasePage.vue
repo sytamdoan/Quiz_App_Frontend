@@ -208,8 +208,23 @@ function downloadResponses() {
   })
 
   // Start creating CSV
+  let csv = ",Question IDs:,";
+  csv+= arrQuestionIDs.join(",") + "\n";
+
+  csv+= ",Answer Key:,";
+  csv+= arrAnswerKeys.join(",") + "\n";
+
+  arrStudentData.forEach((row) => {
+    csv+=row.join(",") + "\n"
+  })
+
+  // Now download as a csv (referencing code from stackoverflow below)
   // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
-  const csv = ",Question IDs:,";
+  const anchor = document.createElement('a');
+  anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  anchor.target = '_blank';
+  anchor.download = 'responses.csv';
+  anchor.click();
 }
 
 </script>
