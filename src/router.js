@@ -49,6 +49,11 @@ const router = createRouter({
       component: () => import("./views/QuizSessionDatabasePage.vue"),
     },
     {
+      path: "/ResponseDatabasePage/:quizSessionID",
+      name: "ResponseDatabasePage",
+      component: () => import("./views/ResponseDatabasePage.vue"),
+    },
+    {
       path: "/AnswerDatabasePage/:questionID",
       name: "AnswerDatabasePage",
       component: () => import("./views/AnswerDatabasePage.vue"),

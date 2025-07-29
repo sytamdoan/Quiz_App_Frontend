@@ -95,8 +95,8 @@ async function fetchItems() {
   Item.value = response.data
 }
 
-function openUpdateItem(Item, itemData) {
-  addItemCheck.value = itemData;
+function openUpdateItem(Item, isAdding) {
+  addItemCheck.value = isAdding;
   if(addItemCheck.value) {
     selectedItem.value = {};
   } else {
@@ -113,6 +113,9 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+function goToResponseDatabasePage(QuizSessionID) {
+  router.push({ name: "ResponseDatabasePage", params: {quizSessionID: QuizSessionID} });
+}
 </script>
 
 <template>
@@ -138,6 +141,8 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.isActive }}</td>
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.expirationDate }}</td>
         <td>
+          <a @click="goToResponseDatabasePage(item.id)" style="color: blue; cursor: pointer; text-decoration: underline;">View Responses</a>
+          |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateItem(item, false)"> mdi-pencil </v-icon>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
