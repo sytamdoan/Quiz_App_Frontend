@@ -145,7 +145,52 @@ function downloadResponses() {
   activateSnackbar("blue", "Download placeholder.");
   // Using reference below to create a csv
   // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
+  // https://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
 
+  // (blank), Question ID, questionId, questionId, questionId
+  // (blank), Answer Key, answerIds, answerIds, answerIds
+  // score, StudentName, answerId, answerId, answerId
+  // score, StudentName, answerId, answerId, answerId
+  // score, StudentName, answerId, answerId, answerId
+
+  // Get the ids of the questions
+  const questionIDs = new Set();
+  Item.value.forEach((item) => {
+    questionIDs.add(item.questionId)
+  })
+
+  // Get correct answers
+  // TODO: Insert new service that gets the list of correct answers for each question
+  const answerKey = {}
+  questionIDs.forEach((item) => {
+    const response = 0 // await QuizServices.getAnswerKey
+    answerKey[item] = [2] // response.data.answerIDs
+  })
+
+  // Populate table with correct data
+  const studentData = {}
+  Item.value.forEach((item) => {
+    // Check if studentId exists
+    if (item.userId == null) {
+      return
+    }
+
+    // Add student row if it doesn't exist
+    if (studentData[item.userId] == undefined)
+    {
+      studentData[item.userId] = {name: item.userNames, score: 0};
+    }
+
+    let student = studentData[item.userId];
+    student[item.questionId] = item.answerId; // Insert their response
+    if (answerKey[item.questionId].includes(item.answerId))
+    {
+      student.score++;
+    }
+  })
+
+  // Start creating CSV
+  console.log(studentData)
 }
 
 </script>
