@@ -116,10 +116,6 @@ function closeSnackBar() {
 function goToResponseDatabasePage(QuizSessionID) {
   router.push({ name: "ResponseDatabasePage", params: {quizSessionID: QuizSessionID} });
 }
-
-function downloadResponses() {
-  activateSnackbar("blue", "Download placeholder.");
-}
 </script>
 
 <template>
@@ -129,15 +125,6 @@ function downloadResponses() {
     label="Search"
     required
   ></v-text-field>
-  
-  <v-card-actions>
-    <v-spacer></v-spacer>
-    <v-btn variant="flat" color="tertiary" @click="downloadResponses">
-      <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
-    </v-btn>
-
-    <v-btn variant="flat" color="primary" @click="openUpdateItem(item, true)">Add {{itemName}}</v-btn>
-  </v-card-actions>
 
   <v-table>
     <thead>
@@ -164,6 +151,11 @@ function downloadResponses() {
       </tr>
     </tbody>
   </v-table>
+  
+  <v-card-actions>
+    <v-spacer></v-spacer>
+    <v-btn variant="flat" color="primary" @click="openUpdateItem(item, true)">Add {{itemName}}</v-btn>
+  </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
     <v-card class="rounded-lg elevation-5">
