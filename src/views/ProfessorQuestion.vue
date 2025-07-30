@@ -142,7 +142,7 @@ async function saveResponses(){
       sRes.questionId = questionSet.value[currentQuestion.value].id;
       console.log(sRes);
 
-      await ResponseServices.addItem(sRes)
+      return ResponseServices.addItem(sRes)
         .catch((err) => {
           console.log("Could not add a response.")
           missedResponses.value.push(sRes);
