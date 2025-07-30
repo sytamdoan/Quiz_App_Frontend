@@ -5,6 +5,7 @@ import { ref, computed  } from "vue";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
+import ResponseServices from "../services/ResponseServices.js"
 import { useRoute, useRouter } from "vue-router";
 
 const socket = io('http://localhost:3001');
@@ -19,6 +20,9 @@ const responseMap = ref(new Map());
 const hasNextQuestion = computed(() => {
   return currentQuestion.value < (questionSet.value.length - 1);
 });
+const isSaveResponse = ref(true);
+const responseBuffer = ref([]);
+const missedResponses = ref([]);
 
 onMounted(async () => {
   try {
@@ -33,6 +37,12 @@ onMounted(async () => {
     })
     socket.on(quizSessionID.value + "response", (data) => {
       console.log(data);
+      const sRes = {};
+      sRes.userId = data.userId;
+      sRes.answerId = data.answer.id;
+
+      responseBuffer.value.push(sRes);
+      console.log(responseBuffer.value);
     })
 
     socket.emit("nextQuestion", {
@@ -77,7 +87,7 @@ async function grabAnswers(questionID) {
       answerSet.value = res.data.map(newAnswer => ({
         id: newAnswer.id,
         answerText: newAnswer.answerText,
-        isCorrect: newAnswer.isCorrect
+//        isCorrect: newAnswer.isCorrect
       }));
       console.log(answerSet.value[0])
     })
@@ -110,11 +120,37 @@ async function sendQuestionsAndAnswers() {
 }
 
 async function loadNextQuestion() {
+  if (isSaveResponse.value){
+    await saveResponses();
+  }
+  isSaveResponse.value=true; // reset the checkbox
+
   currentQuestion.value += 1;
   socket.emit("nextQuestion", {
     quizSessionID: quizSessionID.value
   });
   sendQuestionsAndAnswers();
+}
+
+async function saveResponses(){
+  const buffer = responseBuffer.value
+  responseBuffer.value = [];
+
+  await Promise.all(
+    buffer.map(async (sRes) => {
+      sRes.quizSessionId = quizSessionID.value;
+      sRes.questionId = questionSet.value[currentQuestion.value].id;
+      console.log(sRes);
+
+      await ResponseServices.addItem(sRes)
+        .catch((err) => {
+          console.log("Could not add a response.")
+          missedResponses.value.push(sRes);
+        })
+    }))
+
+  console.log(missedResponses.value);
+  console.log(responseBuffer.value)
 }
 
 async function endQuiz() {
@@ -136,7 +172,11 @@ async function endQuiz() {
 
 <template>
   <v-card-actions>
-    <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">next Question</v-btn>
+    <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">Next Question</v-btn>
     <v-btn variant="flat" color="primary" @click="endQuiz()">Finish Quiz</v-btn>
+  </v-card-actions>
+  <v-card-actions>
+    <input type="checkbox" id="saveResponses" v-model="isSaveResponse"/>
+    <label for="saveResponses">Save Responses upon Next Question</label>
   </v-card-actions>
 </template>
