@@ -115,6 +115,10 @@ function closeSnackBar() {
 function goToQuizPage(ClassID) {
   router.push({ name: "QuizDatabasePage", params: {classID: ClassID} });
 }
+
+function goToQuizGenerationPage(ClassID) {
+  router.push({ name: "Recommendations", params: {classID: ClassID} });
+}
 </script>
 
 <template>
@@ -130,6 +134,7 @@ function goToQuizPage(ClassID) {
         <th class="text-left">ID</th>
         <th class="text-left">Name</th>
         <th class="text-left">Year</th>
+        <th class="text-left">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -138,6 +143,8 @@ function goToQuizPage(ClassID) {
         <td class = "cursor-pointer" @click="openUpdateClass(Class, false)">{{ Class.name }}</td>
         <td class = "cursor-pointer" @click="openUpdateClass(Class, false)">{{ Class.year }}</td>
         <td>
+          <a @click="goToQuizGenerationPage(Class.id)" style="color: blue; cursor: pointer; text-decoration: underline;">Generate Quiz</a>
+          |
           <a @click="goToQuizPage(Class.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Quizzes</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateClass(Class, false)"> mdi-pencil </v-icon>

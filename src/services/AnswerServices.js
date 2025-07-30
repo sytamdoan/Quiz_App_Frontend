@@ -1,6 +1,9 @@
 import apiClient from "./services";
 
 export default {
+  getOneAnswer(answerId) {
+    return apiClient.get("/Answer/" + answerId);
+  },
   getAnswer(questionId) {
     return apiClient.get("/Question/" + questionId + "/Answers/");
   },

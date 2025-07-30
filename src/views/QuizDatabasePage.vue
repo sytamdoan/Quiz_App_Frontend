@@ -111,6 +111,16 @@ function openUpdateQuiz(Quiz, addQuiz) {
   isUpdateQuiz.value = true;
 }
 
+async function duplicateQuiz(Quiz){
+  try {
+    const response = await QuizServices.duplicateQuiz(Quiz.id);
+    console.log("Quiz duplicated", response.data);
+    await fetchQuiz();
+  } catch (err) {
+    console.error("Error duplicating quiz", err);
+  }
+};
+
 function closeUpdateQuiz() {
   isUpdateQuiz.value = false;
 }
@@ -122,6 +132,11 @@ function closeSnackBar() {
 function goToQuestionPage(QuizID) {
   router.push({ name: "QuestionDatabasePage", params: {quizID: QuizID} });
 }
+
+function goToQuizSessionsPage(QuizID) {
+  router.push({ name: "QuizSessionDatabasePage", params: {quizID: QuizID} });
+}
+
 async function startQuiz(Quiz) {
   let quizSession = {
     quizId:Quiz.id,
@@ -133,7 +148,7 @@ async function startQuiz(Quiz) {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Quiz Session Started";
-      router.push({ name: "ProfessorQuestion", params: {quizSessionID: response.data.id} });
+      router.push({ name: "ProfessorWaitingPage", params: {quizSessionID: response.data.id} });
     })
     .catch((error) => {
       snackbar.value.value = true;
@@ -172,7 +187,22 @@ async function startQuiz(Quiz) {
           |
           <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
           |
+          <a @click="goToQuizSessionsPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Sessions</a>
+          |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuiz(Quiz, false)"> mdi-pencil </v-icon>
+          |
+          <v-tooltip text="Duplicate Quiz" location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                color="red"
+                class="cursor-pointer"
+                @click="duplicateQuiz(Quiz)"
+              >
+                mdi-content-duplicate
+              </v-icon>
+            </template>
+          </v-tooltip>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteQuiz(Quiz.id)"> mdi-delete </v-icon>
         </td>

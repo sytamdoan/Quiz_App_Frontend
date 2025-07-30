@@ -14,7 +14,7 @@ const router = createRouter({
       component: () => import("./views/Login.vue"),
     },
     {
-      path: "/Recommendations",
+      path: "/Recommendations/:classID",
       name: "Recommendations",
       component: () => import("./views/Recommendations.vue"),
     },
@@ -44,6 +44,16 @@ const router = createRouter({
       component: () => import("./views/QuestionDatabasePage.vue"),
     },
     {
+      path: "/QuizSessionDatabasePage/:quizID",
+      name: "QuizSessionDatabasePage",
+      component: () => import("./views/QuizSessionDatabasePage.vue"),
+    },
+    {
+      path: "/ResponseDatabasePage/:quizSessionID",
+      name: "ResponseDatabasePage",
+      component: () => import("./views/ResponseDatabasePage.vue"),
+    },
+    {
       path: "/AnswerDatabasePage/:questionID",
       name: "AnswerDatabasePage",
       component: () => import("./views/AnswerDatabasePage.vue"),
@@ -54,7 +64,7 @@ const router = createRouter({
       component: () => import("./views/UserDatabasePage.vue"),
     },
     {
-      path: "/StudentQuestion",
+      path: "/StudentQuestion/:quizSessionID",
       name: "StudentQuestion",
       component: () => import("./views/StudentQuestion.vue"),
     },
@@ -62,6 +72,21 @@ const router = createRouter({
       path: "/ProfessorQuestion/:quizSessionID",
       name: "ProfessorQuestion",
       component: () => import("./views/ProfessorQuestion.vue"),
+    },
+    {
+      path: "/ProfessorWaitingPage/:quizSessionID",
+      name: "ProfessorWaitingPage",
+      component: () => import("./views/ProfessorWaitingPage.vue"),
+    },
+    {
+      path: "/ProfessorEndQuizPage/",
+      name: "ProfessorEndQuizPage",
+      component: () => import("./views/ProfessorEndQuizPage.vue"),
+    },
+    {
+      path: "/StudentEndQuizPage/",
+      name: "StudentEndQuizPage",
+      component: () => import("./views/StudentEndQuizPage.vue"),
     },
   ],
 });
