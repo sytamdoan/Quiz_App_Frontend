@@ -40,7 +40,7 @@ const DataQuestions = computed(() => ({
   ]
 }));
 
-const chartSettings= computed(() => ({
+const chartSettings = computed(() => ({
   responsive: true,
   plugins: {
     title: {
@@ -224,15 +224,15 @@ async function endQuiz() {
 </script>
 
 <template>
-
-  <Bar :data="DataQuestions" :chart-options="chartSettings" />
-
-  <v-card-actions>
+  <div style="width: 700px; height: 500px;">
+    <Bar :data="DataQuestions" :chart-options="chartSettings" />
+      <v-card-actions>
     <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">Next Question</v-btn>
     <v-btn variant="flat" color="primary" @click="endQuiz()">Finish Quiz</v-btn>
-  </v-card-actions>
-  <v-card-actions>
-    <input type="checkbox" id="saveResponses" v-model="isSaveResponse"/>
-    <label for="saveResponses">Save Responses upon Next Question</label>
-  </v-card-actions>
+    </v-card-actions>
+    <v-card-actions>
+      <input type="checkbox" id="saveResponses" v-model="isSaveResponse"/>
+      <label for="saveResponses">Save Responses upon Next Question</label>
+    </v-card-actions>
+  </div>
 </template>
