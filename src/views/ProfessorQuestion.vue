@@ -6,6 +6,10 @@ import QuizSessionServices from "../services/QuizSessionServices.js";
 import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
 import { useRoute, useRouter } from "vue-router";
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS} from 'chart.js'
+import{Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale} from 'chart.js'
+ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale)
 
 const socket = io('http://localhost:3001');
 const route = useRoute();
@@ -14,11 +18,37 @@ const quizSessionID = ref('');
 const quizID = ref('');
 const questionSet = ref({})
 const answerSet = ref({})
+const QuestionsXAxis = ref([])
+const responseTallies = ref([])
+const chartTitle = ref("")
 const currentQuestion = ref(0)
-const responseMap = ref(new Map());
 const hasNextQuestion = computed(() => {
   return currentQuestion.value < (questionSet.value.length - 1);
 });
+
+const DataQuestions = computed(() => ({
+  labels: QuestionsXAxis.value,
+  datasets: [
+    {
+      data: responseTallies.value,
+      backgroundColor: 'red'
+    }
+  ]
+}));
+
+const chartSettings= computed(() => ({
+  responsive: true,
+  plugins: {
+    title: {
+      display: true,
+      text: chartTitle.value,
+      font: {
+        size: 18
+      },
+    }
+  }
+}))
+
 
 onMounted(async () => {
   try {
@@ -54,7 +84,6 @@ async function grabQuestions() {
         questionText: newQuestion.questionText,
         quizId: newQuestion.quizId
       }));
-      console.log(questionSet.value[0])
     })
     .catch((error) => {
       console.error("Something Wrong Happened")
@@ -80,10 +109,6 @@ async function grabAnswers(questionID) {
         answerText: newAnswer.answerText,
         isCorrect: newAnswer.isCorrect
       }));
-
-      res.data.forEach(newAnswer => {
-        responseMap.value.set(newAnswer.answerText, 0);
-      });
     })
     .catch((error) => {
       console.error("Something Wrong Happened")
@@ -107,10 +132,22 @@ async function sendAnswers() {
   });
 }
 
+async function resetAndRepopulateBarGraph() {
+  chartTitle.value = questionSet.value[currentQuestion.value].questionText;
+  QuestionsXAxis.value = [];
+  responseTallies.value = [];
+  for (const key in answerSet.value) {
+    const answers = answerSet.value[key].answerText;
+    QuestionsXAxis.value.push(answers);
+    responseTallies.value.push(0);
+  }
+}
+
 async function sendQuestionsAndAnswers() {
   await grabAnswers(questionSet.value[currentQuestion.value].id);
   sendQuestion();
   sendAnswers();
+  resetAndRepopulateBarGraph();
 }
 
 async function loadNextQuestion() {
@@ -118,18 +155,17 @@ async function loadNextQuestion() {
   socket.emit("nextQuestion", {
     quizSessionID: quizSessionID.value
   });
-  responseMap.value.clear();
   sendQuestionsAndAnswers();
 }
 
 
 async function tallyResponse(response) {
-  if(!responseMap.value.has(response.answerText)) {
-    responseMap.value.set(response.answerText, 1);
-  } else {
-    const currentResponseValue = responseMap.value.get(response.answerText);
-    responseMap.value.set(response.answerText,currentResponseValue + 1);
+  const indexOfResponse = QuestionsXAxis.value.indexOf(response.answerText)
+  if(indexOfResponse !== -1) {
+    responseTallies.value[indexOfResponse] += 1;
+    responseTallies.value = [...responseTallies.value]
   }
+
 }
 
 async function endQuiz() {
@@ -151,9 +187,7 @@ async function endQuiz() {
 
 <template>
 
-  <p v-for="[response ,value] in Array.from(responseMap)" :response="response">
-    {{ response }} : {{ value }}
-  </p>
+  <Bar :data="DataQuestions" :chart-options="chartSettings" />
 
   <v-card-actions>
     <v-btn v-if="hasNextQuestion" variant="flat" color="primary" @click="loadNextQuestion()">next Question</v-btn>
