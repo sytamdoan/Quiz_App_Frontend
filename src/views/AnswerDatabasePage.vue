@@ -102,6 +102,8 @@ async function fetchData() {
 }
 
 function openUpdateModal(Item, addItem) {
+  if(isEditable)
+    return;
   addItemCheck.value = addItem;
     if(addItemCheck.value) {
     selectedItem.value = {

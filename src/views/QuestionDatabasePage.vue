@@ -103,6 +103,8 @@ async function fetchQuestion() {
 }
 
 function openUpdateQuestion(Question, addQuestion) {
+  if(isEditable)
+    return;
   addQuestionCheck.value = addQuestion;
     if(addQuestionCheck.value) {
     selectedQuestion.value = {};
