@@ -125,6 +125,7 @@ function goToResponseDatabasePage(QuizSessionID) {
     label="Search"
     required
   ></v-text-field>
+
   <v-table>
     <thead>
       <tr>
@@ -150,6 +151,7 @@ function goToResponseDatabasePage(QuizSessionID) {
       </tr>
     </tbody>
   </v-table>
+  
   <v-card-actions>
     <v-spacer></v-spacer>
     <v-btn variant="flat" color="primary" @click="openUpdateItem(item, true)">Add {{itemName}}</v-btn>
