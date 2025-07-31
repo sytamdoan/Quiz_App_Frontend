@@ -3,6 +3,7 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import AnswerServices from "../services/AnswerServices.js";
+import QuizServices from "../services/QuizServices.js";
 import { useRoute } from "vue-router";
 
 const Item = ref([])
@@ -10,6 +11,7 @@ const route = useRoute();
 const myQuestionID = ref('')
 const selectedItem = ref({})
 const isUpdateItem = ref(false);
+const isEditable = ref(false);
 const addItemCheck = ref(false);
 const searchQuery = ref('');
 const snackbar = ref({
@@ -35,6 +37,11 @@ const filteredData = computed(() => {
 onMounted(async () => {
   try {
     myQuestionID.value = route.params.questionID;
+    await QuizServices.getQuizByQuestionId(myQuestionID.value)
+    .then((response) => {
+      if(response.data != undefined)
+        isEditable.value = response.data.isEditable
+    });
     fetchData()
   } catch (error) {
     console.error("Cannot Fetch Answers: ", error)
@@ -136,17 +143,20 @@ function closeSnackBar() {
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.id }}</td>
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.answerText }}</td>
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.isCorrect }}</td>
-        <td>
+        <td v-if="isEditable">
           <v-icon color="red" class="cursor-pointer" @click="openUpdateModal(Item, false)"> mdi-pencil </v-icon>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(Item.id)"> mdi-delete </v-icon>
+        </td>
+        <td v-else >
+          Not Editable
         </td>
       </tr>
     </tbody>
   </v-table>
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openUpdateModal(Item, true)">Add Answer</v-btn>
+    <v-btn v-if="isEditable" variant="flat" color="primary" @click="openUpdateModal(Item, true)">Add Answer</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateItem" width="800">

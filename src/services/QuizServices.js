@@ -4,6 +4,12 @@ export default {
   getQuiz(classID) {
     return apiClient.get("/Class/" + classID + "/Quiz/");
   },
+  getQuizById(quizID) {
+    return apiClient.get("/Quiz/" + quizID);
+  },
+  getQuizByQuestionId(questionID) {
+    return apiClient.get("/Quiz/" + questionID + "/Question/");
+  },
   addQuiz(classID, Quiz) {
     return apiClient.post("/Class/" + classID + "/Quiz/", Quiz);
   },

@@ -182,7 +182,7 @@ async function startQuiz(Quiz) {
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.type }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.subject }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuiz(Quiz, false)">{{ Quiz.timeLimit }}</td>
-        <td>
+        <td v-if="Quiz.isEditable">
           <v-icon color="red" class="cursor-pointer" @click="startQuiz(Quiz)"> mdi-timer </v-icon>
           |
           <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
@@ -205,6 +205,28 @@ async function startQuiz(Quiz) {
           </v-tooltip>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteQuiz(Quiz.id)"> mdi-delete </v-icon>
+        </td>
+        <td v-else>
+          <v-icon color="red" class="cursor-pointer" @click="startQuiz(Quiz)"> mdi-timer </v-icon>
+          |
+          <a @click="goToQuestionPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Questions</a>
+          |
+          <a @click="goToQuizSessionsPage(Quiz.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Sessions</a>
+          |
+          <v-tooltip text="Duplicate Quiz" location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                color="red"
+                class="cursor-pointer"
+                @click="duplicateQuiz(Quiz)"
+              >
+                mdi-content-duplicate
+              </v-icon>
+            </template>
+          </v-tooltip>
+          |
+          Not Editable
         </td>
       </tr>
     </tbody>
