@@ -1,8 +1,8 @@
 import apiClient from "./services";
 
 export default {
-  getItems() { // note: add filters (i.e., QuizSession) to req.body
-    return apiClient.get("/Response");
+  getItems(Filter) {
+    return apiClient.get("/Response", { params: Filter });
   },
   getItem(id) {
     return apiClient.get("/Response/" + id)

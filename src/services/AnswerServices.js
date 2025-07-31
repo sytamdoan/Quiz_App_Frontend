@@ -7,6 +7,9 @@ export default {
   getAnswer(questionId) {
     return apiClient.get("/Question/" + questionId + "/Answers/");
   },
+  getAnswersWithFilter(Filter){
+    return apiClient.get("/Answer/filter", {params: Filter} )
+  },
   addAnswer(questionId, Answer) {
     return apiClient.post("/Question/" + questionId + "/Answer/", Answer);
   },

@@ -19,9 +19,16 @@ const snackbar = ref({
   color: "",
   text: "",
 });
-
+const user = ref({});
 
 onMounted(async () => {
+  if (localStorage.getItem("user") !== null) {
+    user.value = JSON.parse(localStorage.getItem("user"));
+    console.log("User is logged in.")
+  } else {
+    console.log("User is not logged in.");
+  }
+
   try {
     quizSessionID.value = route.params.quizSessionID;
     console.log(route.params.quizSessionID);
@@ -33,6 +40,7 @@ onMounted(async () => {
     })
     socket.on(quizSessionID.value + "answer", (data) => {
       answerSet.value = data;
+      console.log(answerSet);
     })
     socket.on(quizSessionID.value + "end", (data) => {
       router.push({ name: "StudentEndQuizPage" });
@@ -67,6 +75,7 @@ function openConfirmationBar() {
 function submitAnswer() {
     snackbar.value.value = false;
     socket.emit("response", {
+        userId: user.value.id,
         quizSessionID: quizSessionID.value,
         answer: selectedAnswer.value,
     });
