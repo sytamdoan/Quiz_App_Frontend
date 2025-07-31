@@ -154,6 +154,12 @@ async function saveResponses(){
 }
 
 async function endQuiz() {
+  if (isSaveResponse.value){
+    await saveResponses();
+  }
+  console.log("Here are missed responses.");
+  console.log(missedResponses);
+
   await QuizSessionServices.endQuizSession(quizSessionID.value)
     .then((res) => {
       console.log("Quiz has ended")
