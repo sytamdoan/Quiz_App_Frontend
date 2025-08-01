@@ -102,7 +102,7 @@ async function fetchData() {
 }
 
 function openUpdateModal(Item, addItem) {
-  if(isEditable)
+  if(!isEditable.value)
     return;
   addItemCheck.value = addItem;
     if(addItemCheck.value) {
