@@ -3,6 +3,7 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import QuestionServices from "../services/QuestionServices.js";
+import QuizServices from "../services/QuizServices.js";
 import { useRoute, useRouter } from "vue-router";
 
 const Question = ref([])
@@ -11,6 +12,7 @@ const router = useRouter();
 const myQuizID = ref('')
 const selectedQuestion = ref({})
 const isUpdateQuestion = ref(false);
+const isEditable = ref(false);
 const addQuestionCheck = ref(false);
 const searchQuery = ref('');
 const snackbar = ref({
@@ -36,6 +38,11 @@ const filteredData = computed(() => {
 onMounted(async () => {
   try {
     myQuizID.value = route.params.quizID;
+    await QuizServices.getQuizById(myQuizID.value)
+    .then((response) => {
+      if(response.data != undefined)
+        isEditable.value = response.data.isEditable
+    });
     fetchQuestion()
   } catch (error) {
     console.error("Cannot Fetch Questions: ", error)
@@ -96,6 +103,8 @@ async function fetchQuestion() {
 }
 
 function openUpdateQuestion(Question, addQuestion) {
+  if(!isEditable.value)
+    return;
   addQuestionCheck.value = addQuestion;
     if(addQuestionCheck.value) {
     selectedQuestion.value = {};
@@ -136,19 +145,24 @@ function goToAnswerPage(questionID) {
       <tr v-for="Question in filteredData" :key="Question.id" class="mb-2">
         <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.id }}</td>
         <td class = "cursor-pointer" @click="openUpdateQuestion(Question, false)">{{ Question.questionText }}</td>
-        <td>
+        <td v-if="isEditable">
           <a @click="goToAnswerPage(Question.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Answers</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateQuestion(Question, false)"> mdi-pencil </v-icon>
           |
           <v-icon color="red" class="cursor-pointer" @click="deleteQuestion(Question.id)"> mdi-delete </v-icon>
         </td>
+        <td v-else>
+          <a @click="goToAnswerPage(Question.id)" style="color: blue; cursor: pointer; text-decoration: underline;"> View Answers</a>
+          |
+          Not Editable
+        </td>
       </tr>
     </tbody>
   </v-table>
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="primary" @click="openUpdateQuestion(Question, true)">Add Question</v-btn>
+    <v-btn v-if="isEditable" variant="flat" color="primary" @click="openUpdateQuestion(Question, true)">Add Question</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateQuestion" width="800">
