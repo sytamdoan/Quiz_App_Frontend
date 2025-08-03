@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { io } from 'socket.io-client';
-import { ref, computed  } from "vue";
+import { ref, computed } from "vue";
+import QuizServices from '../services/QuizServices.js';
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import QuestionServices from "../services/QuestionServices.js";
 import AnswerServices from "../services/AnswerServices.js";
@@ -29,6 +30,35 @@ const hasNextQuestion = computed(() => {
 const isSaveResponse = ref(true);
 const responseBuffer = ref([]);
 const missedResponses = ref([]);
+
+const quiz = ref({ timeLimit: 20 });
+const timeLeft = ref('00:00');
+const remainingSeconds = ref(0);
+let intervalId = null;
+
+const updateTimeDisplay = () => {
+  const minutes = Math.floor(remainingSeconds.value / 60);
+  const seconds = remainingSeconds.value % 60;
+  timeLeft.value = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const startCountdown = () => {
+  updateTimeDisplay();
+  intervalId = setInterval(() => {
+    if (remainingSeconds.value > 0) {
+      remainingSeconds.value--;
+      updateTimeDisplay();
+    } else {
+      clearInterval(intervalId);
+    }
+  }, 1000); //this forces the setInterval to run every 1000 ms
+};
+
+const resetCountdown = () => {
+  clearInterval(intervalId);
+  remainingSeconds.value = quiz.value.timeLimit;
+  startCountdown();
+};
 
 const DataQuestions = computed(() => ({
   labels: QuestionsXAxis.value,
@@ -58,6 +88,22 @@ onMounted(async () => {
   try {
     quizSessionID.value = route.params.quizSessionID;
     await grabQuizSession();
+
+    // Wait until quizID.value is set
+    while (!quizID.value) {
+      await new Promise((resolve) => setTimeout(resolve, 100)); // wait 50ms
+    }
+    console.log("Resolved quizID:", quizID.value);
+
+    //this is needed to grab the timeLimit from the quiz that we are running a session on
+    const quizData = await QuizServices.getQuizById(quizID.value);
+    quiz.value = quizData.data;
+    remainingSeconds.value = parseInt(quiz.value.timeLimit);
+    console.log("Quiz data response:", quizData);
+console.log("quiz.value.timeLimit:", quizData.data?.timeLimit);
+    startCountdown();
+    console.log("Starting countdown with seconds:", remainingSeconds.value);
+
   } catch (error) {
     console.error("Cannot Fetch QuizSessionId: ", error)
   }
@@ -84,6 +130,10 @@ onMounted(async () => {
   }
 });
 
+onUnmounted(() => {
+  clearInterval(intervalId);
+});
+
 async function grabQuestions() {
   await QuestionServices.getQuestion(quizID.value)
     .then((res) => {
@@ -102,6 +152,7 @@ async function grabQuizSession() {
   await QuizSessionServices.getQuizSession(quizSessionID.value)
     .then((res) => {
       quizID.value = res.data.quizId;
+      
     })
     .catch((error) => {
       console.log(error);
@@ -169,6 +220,7 @@ async function loadNextQuestion() {
     quizSessionID: quizSessionID.value
   });
   sendQuestionsAndAnswers();
+  resetCountdown(); //adding reset to start the question timer over
 }
 
 
@@ -224,6 +276,9 @@ async function endQuiz() {
 </script>
 
 <template>
+  <div class="timer" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+    Time Left: {{ timeLeft }}
+  </div>
   <div style="width: 700px; height: 500px;">
     <Bar :data="DataQuestions" :chart-options="chartSettings" />
       <v-card-actions>
@@ -236,3 +291,9 @@ async function endQuiz() {
     </v-card-actions>
   </div>
 </template>
+
+<style scoped>
+.timer {
+  color: #d32f2f;
+}
+</style>
