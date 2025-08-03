@@ -100,7 +100,7 @@ async function fetchQuiz() {
 }
 
 function openUpdateQuiz(Quiz, addQuiz) {
-  if(!Quiz.isEditable)
+  if(!Quiz.isEditable && !addQuiz)
     return;
   addQuizCheck.value = addQuiz;
     if(addQuizCheck.value) {
