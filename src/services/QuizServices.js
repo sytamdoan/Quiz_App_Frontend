@@ -20,6 +20,9 @@ export default {
     return apiClient.delete("/Quiz/" + QuizID)
   },
   duplicateQuiz(quizId) {
-  return apiClient.post("/Quiz/" + quizId + "/duplicate");
+    return apiClient.post("/Quiz/" + quizId + "/duplicate");
+  },
+  lockQuiz(quizId) {
+    return apiClient.put("/Quiz/" + quizId + "/lock");
   }
 };

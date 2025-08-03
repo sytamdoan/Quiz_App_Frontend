@@ -144,6 +144,10 @@ async function startQuiz(Quiz) {
     quizId:Quiz.id,
     isActive: true,
   };
+
+  //Call the lockQuiz from the controller to ensure the quiz cannot be edited anymore after a session has been created from it
+  await QuizServices.lockQuiz(Quiz.id);
+  
   await QuizSessionServices.addQuizSession(quizSession)
     .then((response) => {
       fetchQuiz()
