@@ -89,20 +89,11 @@ onMounted(async () => {
     quizSessionID.value = route.params.quizSessionID;
     await grabQuizSession();
 
-    // Wait until quizID.value is set
-    while (!quizID.value) {
-      await new Promise((resolve) => setTimeout(resolve, 100)); // wait 50ms
-    }
-    console.log("Resolved quizID:", quizID.value);
-
     //this is needed to grab the timeLimit from the quiz that we are running a session on
     const quizData = await QuizServices.getQuizById(quizID.value);
     quiz.value = quizData.data;
-    remainingSeconds.value = parseInt(quiz.value.timeLimit);
-    console.log("Quiz data response:", quizData);
-console.log("quiz.value.timeLimit:", quizData.data?.timeLimit);
+    remainingSeconds.value = quiz.value.timeLimit;
     startCountdown();
-    console.log("Starting countdown with seconds:", remainingSeconds.value);
 
   } catch (error) {
     console.error("Cannot Fetch QuizSessionId: ", error)
