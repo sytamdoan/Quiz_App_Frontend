@@ -18,6 +18,7 @@ const sessionID = ref("")
 const sessionInfo = ref({
   sessionEntryCode: "",
 });
+const isRequireLogin = ref(false);
 
 function joinQuizSession() {
   const isEmptyField = Object.values(sessionInfo.value).some(
@@ -53,6 +54,13 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+function goToLogin() {
+  router.push({ name: "login"});
+}
+
+function closeRequireLogin() {
+  isRequireLogin.value = false;
+}
 </script>
 
 <template>
@@ -91,4 +99,18 @@ function closeSnackBar() {
       </v-snackbar>
     </div>
   </v-container>
+
+  <v-dialog persistent v-model="isRequireLogin" width="800">
+    <v-card class="rounded-lg elevation-5">
+      <v-card-title class="headline mb-2">This Quiz Requires You To Be Logged In</v-card-title>
+      <v-card-actions>
+        <v-btn variant="flat" color="primary" @click="goToLogin()"
+          >Go To Login</v-btn
+        >
+        <v-btn variant="flat" color="primary" @click="closeRequireLogin()"
+          >Re-input Quiz Code</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
