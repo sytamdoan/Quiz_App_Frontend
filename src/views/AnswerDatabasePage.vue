@@ -9,6 +9,7 @@ import { useRoute } from "vue-router";
 const Item = ref([])
 const route = useRoute();
 const myQuestionID = ref('')
+const quizType = ref();
 const selectedItem = ref({})
 const isUpdateItem = ref(false);
 const isEditable = ref(false);
@@ -99,6 +100,13 @@ async function addItem(Item) {
 async function fetchData() {
   const response = await AnswerServices.getAnswer(myQuestionID.value)
   Item.value = response.data
+
+  // Get the IsPoll data
+  await QuizServices.getQuizByQuestionId(myQuestionID.value)
+  .then((res) => {
+    quizType.value = res.data.type
+    console.log(quizType.value)
+  })
 }
 
 function openUpdateModal(Item, addItem) {
@@ -135,7 +143,7 @@ function closeSnackBar() {
     <thead>
       <tr>
         <th class="text-left">ID</th>
-        <th class="text-left">Answer Test</th>
+        <th class="text-left">Answer Text</th>
         <th class="text-left">Is Correct</th>
         <th class="text-left">Actions</th>
       </tr>
