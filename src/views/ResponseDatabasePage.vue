@@ -25,11 +25,6 @@ const snackbar = ref({
   text: "",
 });
 
-// For swapping IDs with readable data
-const userData = ref([]);
-const questionData = ref([]);
-const answerData = ref([]);
-
 const filteredData = computed(() => {
   let data = Item.value;
   let keyword = searchQuery.value.toLowerCase();
