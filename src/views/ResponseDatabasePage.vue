@@ -16,6 +16,7 @@ const itemName = "Response";
 const Item = ref([])
 const route = useRoute();
 const quizSessionId = ref('')
+const isPoll = ref(false);
 const selectedItem = ref({})
 const isAddMenu = ref(false);
 const searchQuery = ref('');
@@ -90,40 +91,41 @@ async function fetchItems() {
   // Swap IDs for readable data
   // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
-    response.data.map(async (i) => {
-      let userNames = "";
-      let questionText = "";
-      let answerText = "";
-
-      // Get the user's first and last name
-      if (i.userId !== null) {
-        const res = await UserServices.getUserNames(i.userId)
-        userNames = res.data.firstName + " " + res.data.lastName
-      }
-      
-      // Get the question text
-      if (i.questionId !== null) {
-        const res = await QuestionServices.getOneQuestion(i.questionId)
-        questionText = res.data.questionText
-      }
-
-      // Get the answer text
-      if (i.answerId !== null) {
-        const res = await AnswerServices.getOneAnswer(i.answerId)
-        answerText = res.data.answerText
-      }
-      
-      return {
-        ...i,
-        userNames,
-        questionText,
-        answerText
-      }
-
-    })
+    response.data.map(getReadableText)
   );
 
   Item.value = swapped;
+}
+
+async function getReadableText(i) {
+  let userNames = "";
+  let questionText = "";
+  let answerText = "";
+
+  // Get the user's first and last name
+  if (i.userId !== null) {
+    const res = await UserServices.getUserNames(i.userId)
+    userNames = res.data.firstName + " " + res.data.lastName
+  }
+  
+  // Get the question text
+  if (i.questionId !== null) {
+    const res = await QuestionServices.getOneQuestion(i.questionId)
+    questionText = res.data.questionText
+  }
+
+  // Get the answer text
+  if (i.answerId !== null) {
+    const res = await AnswerServices.getOneAnswer(i.answerId)
+    answerText = res.data.answerText
+  }
+  
+  return {
+    ...i,
+    userNames,
+    questionText,
+    answerText
+  }
 }
 
 function openAddMenu(Item) {
