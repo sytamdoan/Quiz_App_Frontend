@@ -40,9 +40,23 @@ async function findSession() {
   await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
   .then((res) => {
     sessionID.value = res.data.id;
-    console.log("Quiz Session Grabbed")
-    router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
-
+    console.log("Quiz Session Grabbed. id=" + sessionID.value)
+    console.log(res)
+    getIsAnonymous(res.data.quizId)
+    .then((res) => {
+      // If quiz requires user to be logged in and user is not logged in, open redirect modal
+      if (!isAnonymous.value && localStorage.getItem("user") === null) {
+        isRequireLogin.value = true
+      } else { // If anonymous or user logged in, proceed to quiz
+        router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
+      }
+    })
+    .catch((err) => {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "Invalid code.";
+      console.error("Unable to get Quiz")
+    })
   })
   .catch((error) => {
     snackbar.value.value = true;
