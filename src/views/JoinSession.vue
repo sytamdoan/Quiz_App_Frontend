@@ -4,6 +4,7 @@ import { ref, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import UserServices from "../services/UserServices.js";
 import QuizSessionServices from "../services/QuizSessionServices.js";
+import QuizServices from "../services/QuizServices.js";
 
 
 const confirmPassword = ref('')
@@ -18,6 +19,7 @@ const sessionID = ref("")
 const sessionInfo = ref({
   sessionEntryCode: "",
 });
+const isAnonymous = ref(true);
 const isRequireLogin = ref(false);
 
 function joinQuizSession() {
@@ -48,6 +50,16 @@ async function findSession() {
     snackbar.value.text = "Invalid code.";
     console.error("Quiz Session Doesn't Exist")
   });
+}
+
+function getIsAnonymous(quizId) {
+  console.log("Fetching Quiz isAnonymous field. id=" + quizId)
+  return QuizServices.getQuizById(quizId)
+  .then((res) => {
+    console.log("Got Quiz.")
+    console.log(res);
+    isAnonymous.value = res.data.isAnonymous
+  })
 }
 
 function closeSnackBar() {
