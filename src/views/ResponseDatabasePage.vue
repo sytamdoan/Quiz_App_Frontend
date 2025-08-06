@@ -145,7 +145,6 @@ function closeSnackBar() {
 }
 
 async function downloadResponses() {
-  activateSnackbar("blue", "Download placeholder.");
   // (blank), Question ID, questionId, questionId, questionId
   // (blank), Answer Key, answerIds, answerIds, answerIds
   // score, StudentName, answerId, answerId, answerId
