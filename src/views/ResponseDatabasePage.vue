@@ -7,17 +7,17 @@ import { useRoute, useRouter } from "vue-router";
 
 // For swapping IDs with readable data
 import UserServices from "../services/UserServices.js"
+import QuizServices from "../services/QuizServices.js"
+import QuizSessionServices from "../services/QuizSessionServices.js"
 import QuestionServices from "../services/QuestionServices.js"
 import AnswerServices from '../services/AnswerServices.js';
 
 const itemName = "Response";
 const Item = ref([])
 const route = useRoute();
-const router = useRouter();
 const quizSessionId = ref('')
 const selectedItem = ref({})
 const isAddMenu = ref(false);
-const addItemCheck = ref(false);
 const searchQuery = ref('');
 const snackbar = ref({
   value: false,
