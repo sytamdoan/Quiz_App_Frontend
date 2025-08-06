@@ -19,7 +19,6 @@ const sessionID = ref("")
 const sessionInfo = ref({
   sessionEntryCode: "",
 });
-const isAnonymous = ref(true);
 const isRequireLogin = ref(false);
 
 onMounted(async () => {
@@ -49,12 +48,10 @@ async function findSession() {
   await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
   .then((res) => {
     sessionID.value = res.data.id;
-    console.log("Quiz Session Grabbed. id=" + sessionID.value)
-    console.log(res)
-    getIsAnonymous(res.data.quizId)
+    QuizServices.getQuizById(res.data.quizId)
     .then((res) => {
       // If quiz requires user to be logged in and user is not logged in, open redirect modal
-      if (!isAnonymous.value && localStorage.getItem("user") === null) {
+      if (!res.data.isAnonymous && localStorage.getItem("user") === null) {
         isRequireLogin.value = true
       } else { // If anonymous or user logged in, proceed to quiz
         router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
@@ -74,14 +71,6 @@ async function findSession() {
     snackbar.value.text = "Invalid code.";
     console.error("Quiz Session Doesn't Exist")
   });
-}
-
-function getIsAnonymous(quizId) {
-  console.log("Fetching Quiz isAnonymous field. id=" + quizId)
-  return QuizServices.getQuizById(quizId)
-  .then((res) => {
-    isAnonymous.value = res.data.isAnonymous
-  })
 }
 
 function closeSnackBar() {
