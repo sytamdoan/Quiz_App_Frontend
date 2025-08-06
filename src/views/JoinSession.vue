@@ -56,6 +56,7 @@ async function findSession() {
       snackbar.value.color = "red";
       snackbar.value.text = "Invalid code.";
       console.error("Unable to get Quiz")
+      console.error(err)
     })
   })
   .catch((error) => {
@@ -70,8 +71,6 @@ function getIsAnonymous(quizId) {
   console.log("Fetching Quiz isAnonymous field. id=" + quizId)
   return QuizServices.getQuizById(quizId)
   .then((res) => {
-    console.log("Got Quiz.")
-    console.log(res);
     isAnonymous.value = res.data.isAnonymous
   })
 }
