@@ -88,16 +88,16 @@ async function fetchItems() {
     quizSessionId: quizSessionId.value
   }
   const response = await Services.getItems(filter)
+  
   // Swap IDs for readable data
-  // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
     response.data.map(getReadableText)
   );
-
   Item.value = swapped;
 }
 
 async function getReadableText(i) {
+  // Note: can improve load speeds if we stored the found data
   let userNames = "";
   let questionText = "";
   let answerText = "";
