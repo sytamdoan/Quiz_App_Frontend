@@ -22,18 +22,27 @@ const sessionInfo = ref({
 const isAnonymous = ref(true);
 const isRequireLogin = ref(false);
 
+onMounted(async () => {
+  const sessionCode = localStorage.getItem("sessionCode")
+  if (sessionCode !== undefined){
+    sessionInfo.value.sessionEntryCode = sessionCode
+  }
+});
+
 function joinQuizSession() {
   const isEmptyField = Object.values(sessionInfo.value).some(
       (value) => value === null || value === '' || value === undefined
   );
 
   if (isEmptyField) {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = "All fields must be filled.";
-      return;
+    snackbar.value.value = true;
+    snackbar.value.color = "red";
+    snackbar.value.text = "All fields must be filled.";
+    return;
+  } else {
+    localStorage.setItem("sessionCode", sessionInfo.value.sessionEntryCode)
+    findSession();
   }
-  findSession();
 }
 
 async function findSession() {
