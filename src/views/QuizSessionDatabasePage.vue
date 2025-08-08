@@ -80,7 +80,7 @@ async function updateItem(id, itemData) {
 
 async function addItem(Item) {
   // Lock quiz when making the session
-  await QuizServices.lockQuiz()
+  await QuizServices.lockQuiz(myQuizID.value)
 
   const newSession = {
     quizId: myQuizID.value,
