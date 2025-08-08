@@ -3,12 +3,14 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import AnswerServices from "../services/AnswerServices.js";
+import QuestionServices from "../services/QuestionServices.js";
 import QuizServices from "../services/QuizServices.js";
 import { useRoute } from "vue-router";
 
 const Item = ref([])
 const route = useRoute();
 const myQuestionID = ref('')
+const questionText = ref('');
 const quizType = ref();
 const selectedItem = ref({})
 const isUpdateItem = ref(false);
@@ -98,7 +100,12 @@ async function addItem(Item) {
 };
 
 async function fetchData() {
-  const response = await AnswerServices.getAnswer(myQuestionID.value)
+  // Get questionText
+  let response = await QuestionServices.getOneQuestion(myQuestionID.value)
+  questionText.value = response.data.questionText
+
+  // Get answers
+  response = await AnswerServices.getAnswer(myQuestionID.value)
   Item.value = response.data
 
   // Get the IsPoll data
@@ -134,6 +141,7 @@ function closeSnackBar() {
 
 <template>
   <h1 class="title">Answer Database</h1>
+  <h2 class="title">{{ questionText }}</h2>
   <v-text-field
     v-model="searchQuery"
     label="Search"
