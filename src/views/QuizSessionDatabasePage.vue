@@ -124,6 +124,11 @@ function closeSnackBar() {
 function goToResponseDatabasePage(QuizSessionID) {
   router.push({ name: "ResponseDatabasePage", params: {quizSessionID: QuizSessionID} });
 }
+
+function goToLiveQuiz(QuizSessionID) {
+  router.push({ name: "ProfessorWaitingPage", params: {quizSessionID: QuizSessionID} });
+}
+
 </script>
 
 <template>
@@ -150,6 +155,10 @@ function goToResponseDatabasePage(QuizSessionID) {
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.isActive }}</td>
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.expirationDate }}</td>
         <td>
+          <span v-if="item.isActive">
+            <v-icon color="red" class="cursor-pointer" @click="goToLiveQuiz(item.id)"> mdi-timer </v-icon>
+            |
+          </span>
           <a @click="goToResponseDatabasePage(item.id)" style="color: blue; cursor: pointer; text-decoration: underline;">View Responses</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateItem(item, false)"> mdi-pencil </v-icon>
@@ -209,11 +218,11 @@ function goToResponseDatabasePage(QuizSessionID) {
             scrollable
             :show-current="true"
           >
-            <template v-slot:actions>
-              <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
-            </template>
-          </v-date-picker>
-        </v-menu>
+          <template v-slot:actions>
+            <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
+          </template>
+        </v-date-picker>
+      </v-menu>
 
       </v-card-text>
       <v-card-actions>
