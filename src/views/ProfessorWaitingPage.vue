@@ -1,13 +1,11 @@
 <script setup>
 import { onMounted } from 'vue'
-import { io } from 'socket.io-client';
 import { ref, computed  } from "vue";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const quizSessionID = ref('');
-const socket = io('http://localhost:3001');
 const route = useRoute();
 const entryCode = ref('');
 
