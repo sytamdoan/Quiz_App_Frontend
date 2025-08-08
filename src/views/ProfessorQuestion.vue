@@ -13,7 +13,7 @@ import { Chart as ChartJS} from 'chart.js'
 import{Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale} from 'chart.js'
 ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale)
 
-const socket = io('http://localhost:3001');
+const socket = io(`http://${import.meta.env.VITE_DB_HOST}:3001`);
 const route = useRoute();
 const router = useRouter();
 const quizSessionID = ref('');

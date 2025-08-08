@@ -7,7 +7,7 @@ import QuizSessionServices from "../services/QuizSessionServices.js";
 import QuizServices from '../services/QuizServices.js';
 
 
-const socket = io('http://localhost:3001');
+const socket = io(`http://${import.meta.env.VITE_DB_HOST}:3001`);
 const router = useRouter();
 const route = useRoute();
 const quizSessionID = ref(0);

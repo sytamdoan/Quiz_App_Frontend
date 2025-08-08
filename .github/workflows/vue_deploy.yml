@@ -11,8 +11,13 @@ jobs:
   aws-deploy:
     runs-on: ubuntu-latest
     #For google auth
+    env:
+      VITE_DB_HOST: ${{ secrets.AWS_HOST }}
 
     steps:
+      - name: Create .env file
+        run: |
+          echo "VITE_DB_HOST=${VITE_DB_HOST}" > .env
       - uses: actions/checkout@v2
         # may need to change to version 3
         with:
