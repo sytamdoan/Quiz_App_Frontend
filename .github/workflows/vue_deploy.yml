@@ -30,7 +30,7 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo VITE_DB_HOST= "$VITE_DB_HOST" > dist/.env
+          echo VITE_DB_HOST="$VITE_DB_HOST" > dist/.env
 
       - name: Show .env file contents
         run: cat dist/.env

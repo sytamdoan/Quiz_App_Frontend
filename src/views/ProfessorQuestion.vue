@@ -85,6 +85,8 @@ const chartSettings = computed(() => ({
 
 
 onMounted(async () => {
+  console.log("Address");
+  console.log(`${import.meta.env.VITE_DB_HOST}`);
   try {
     quizSessionID.value = route.params.quizSessionID;
     await grabQuizSession();
