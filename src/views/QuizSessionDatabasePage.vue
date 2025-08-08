@@ -4,6 +4,7 @@ import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import Services from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
+import QuizServices from '../services/QuizServices.js';
 
 const itemName = "Quiz Session";
 const Item = ref([])
@@ -78,7 +79,14 @@ async function updateItem(id, itemData) {
 };
 
 async function addItem(Item) {
-  await Services.addItem(myQuizID.value, Item)
+  // Lock quiz when making the session
+  await QuizServices.lockQuiz()
+
+  const newSession = {
+    quizId: myQuizID.value,
+    isActive: Item.isActive
+  }
+  await Services.addQuizSession(newSession)
     .then(() => {
       fetchItems()
       activateSnackbar("green", itemName + " Added");
@@ -159,9 +167,11 @@ function goToResponseDatabasePage(QuizSessionID) {
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Update {{itemName}}</v-card-title>
+      <v-card-title v-if="addItemCheck" class="headline mb-2">Add {{itemName}}</v-card-title>
+      <v-card-title v-else class="headline mb-2">Update {{itemName}}</v-card-title>
       <v-card-text>
         <v-text-field
+          v-if="!addItemCheck"
           v-model="selectedItem.entryCode"
           label="Entry Code"
           required
@@ -177,6 +187,7 @@ function goToResponseDatabasePage(QuizSessionID) {
         </v-radio-group>
 
         <v-menu
+          v-if="!addItemCheck"
           v-model="dateMenu"
           :close-on-content-click="false"
           transition="scale-transition"
