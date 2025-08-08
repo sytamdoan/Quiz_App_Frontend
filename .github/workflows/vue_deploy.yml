@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Create .env file
         run: |
+          touch .env
           echo "VITE_DB_HOST=${VITE_DB_HOST}" > .env
       - uses: actions/checkout@v2
         # may need to change to version 3
