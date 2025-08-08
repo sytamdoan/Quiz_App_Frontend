@@ -30,6 +30,9 @@ jobs:
 
       - run: npm install
       - run: npm run build
+      
+      - name: Show .env file contents
+        run: cat .env
 
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v2.1.1
