@@ -26,13 +26,16 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo "VITE_DB_HOST=${VITE_DB_HOST}" > .env
+          echo "VITE_DB_HOST=${VITE_DB_HOST}" > dist/.env
 
       - run: npm install
       - run: npm run build
 
       - name: Show .env file contents
-        run: cat .env
+        run: cat dist/.env
+
+      - name: List files in dist directory
+        run: ls -al dist/
 
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v2.1.1
