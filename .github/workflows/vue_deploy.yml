@@ -15,10 +15,6 @@ jobs:
       VITE_DB_HOST: ${{ secrets.AWS_HOST }}
 
     steps:
-      - name: Create .env file
-        run: |
-          touch .env
-          echo "VITE_DB_HOST=${VITE_DB_HOST}" > .env
       - uses: actions/checkout@v2
         # may need to change to version 3
         with:
@@ -27,10 +23,14 @@ jobs:
         #May need to change to version 18 #changed!
         with:
           node-version: 18
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "VITE_DB_HOST=${VITE_DB_HOST}" > .env
 
       - run: npm install
       - run: npm run build
-      
+
       - name: Show .env file contents
         run: cat .env
 
