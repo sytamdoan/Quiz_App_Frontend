@@ -4,6 +4,7 @@ import { ref, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import UserServices from "../services/UserServices.js";
 import QuizSessionServices from "../services/QuizSessionServices.js";
+import QuizServices from "../services/QuizServices.js";
 
 
 const confirmPassword = ref('')
@@ -18,6 +19,14 @@ const sessionID = ref("")
 const sessionInfo = ref({
   sessionEntryCode: "",
 });
+const isRequireLogin = ref(false);
+
+onMounted(async () => {
+  const sessionCode = localStorage.getItem("sessionCode")
+  if (sessionCode !== undefined){
+    sessionInfo.value.sessionEntryCode = sessionCode
+  }
+});
 
 function joinQuizSession() {
   const isEmptyField = Object.values(sessionInfo.value).some(
@@ -25,21 +34,36 @@ function joinQuizSession() {
   );
 
   if (isEmptyField) {
-      snackbar.value.value = true;
-      snackbar.value.color = "red";
-      snackbar.value.text = "All fields must be filled.";
-      return;
+    snackbar.value.value = true;
+    snackbar.value.color = "red";
+    snackbar.value.text = "All fields must be filled.";
+    return;
+  } else {
+    localStorage.setItem("sessionCode", sessionInfo.value.sessionEntryCode)
+    findSession();
   }
-  findSession();
 }
 
 async function findSession() {
   await QuizSessionServices.findQuizSession(sessionInfo.value.sessionEntryCode)
   .then((res) => {
     sessionID.value = res.data.id;
-    console.log("Quiz Session Grabbed")
-    router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
-
+    QuizServices.getQuizById(res.data.quizId)
+    .then((res) => {
+      // If quiz requires user to be logged in and user is not logged in, open redirect modal
+      if (!res.data.isAnonymous && localStorage.getItem("user") === null) {
+        isRequireLogin.value = true
+      } else { // If anonymous or user logged in, proceed to quiz
+        router.push({ name: "StudentQuestion", params: {quizSessionID: sessionID.value} });
+      }
+    })
+    .catch((err) => {
+      snackbar.value.value = true;
+      snackbar.value.color = "red";
+      snackbar.value.text = "Invalid code.";
+      console.error("Unable to get Quiz")
+      console.error(err)
+    })
   })
   .catch((error) => {
     snackbar.value.value = true;
@@ -53,6 +77,13 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+function goToLogin() {
+  router.push({ name: "login"});
+}
+
+function closeRequireLogin() {
+  isRequireLogin.value = false;
+}
 </script>
 
 <template>
@@ -91,4 +122,18 @@ function closeSnackBar() {
       </v-snackbar>
     </div>
   </v-container>
+
+  <v-dialog persistent v-model="isRequireLogin" width="800">
+    <v-card class="rounded-lg elevation-5">
+      <v-card-title class="headline mb-2">This Quiz Requires You To Be Logged In</v-card-title>
+      <v-card-actions>
+        <v-btn variant="flat" color="primary" @click="goToLogin()"
+          >Go To Login</v-btn
+        >
+        <v-btn variant="flat" color="primary" @click="closeRequireLogin()"
+          >Re-input Quiz Code</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
