@@ -59,8 +59,6 @@ const resetCountdown = () => {
 };
 
 onMounted(async () => {
-  console.log("Address");
-  console.log(`${import.meta.env.VITE_DB_HOST}`);
   if (localStorage.getItem("user") !== null) {
     user.value = JSON.parse(localStorage.getItem("user"));
     console.log("User is logged in.")
