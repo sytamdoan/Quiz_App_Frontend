@@ -56,4 +56,4 @@ jobs:
           SOURCE: "dist/.env"
           REMOTE_HOST: "ec2-3-144-112-181.us-east-2.compute.amazonaws.com"
           REMOTE_USER: ubuntu
-          TARGET: "Quiz_App_frontend"
+          TARGET: "Quiz_App_Frontend"
