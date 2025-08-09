@@ -4,6 +4,7 @@ import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import Services from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
+import QuizServices from '../services/QuizServices.js';
 
 const itemName = "Quiz Session";
 const Item = ref([])
@@ -78,7 +79,14 @@ async function updateItem(id, itemData) {
 };
 
 async function addItem(Item) {
-  await Services.addItem(myQuizID.value, Item)
+  // Lock quiz when making the session
+  await QuizServices.lockQuiz(myQuizID.value)
+
+  const newSession = {
+    quizId: myQuizID.value,
+    isActive: Item.isActive
+  }
+  await Services.addQuizSession(newSession)
     .then(() => {
       fetchItems()
       activateSnackbar("green", itemName + " Added");
@@ -116,6 +124,11 @@ function closeSnackBar() {
 function goToResponseDatabasePage(QuizSessionID) {
   router.push({ name: "ResponseDatabasePage", params: {quizSessionID: QuizSessionID} });
 }
+
+function goToLiveQuiz(QuizSessionID) {
+  router.push({ name: "ProfessorWaitingPage", params: {quizSessionID: QuizSessionID} });
+}
+
 </script>
 
 <template>
@@ -142,6 +155,10 @@ function goToResponseDatabasePage(QuizSessionID) {
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.isActive }}</td>
         <td class = "cursor-pointer" @click="openUpdateItem(item, false)">{{ item.expirationDate }}</td>
         <td>
+          <span v-if="item.isActive">
+            <v-icon color="red" class="cursor-pointer" @click="goToLiveQuiz(item.id)"> mdi-timer </v-icon>
+            |
+          </span>
           <a @click="goToResponseDatabasePage(item.id)" style="color: blue; cursor: pointer; text-decoration: underline;">View Responses</a>
           |
           <v-icon color="red" class="cursor-pointer" @click="openUpdateItem(item, false)"> mdi-pencil </v-icon>
@@ -159,9 +176,11 @@ function goToResponseDatabasePage(QuizSessionID) {
 
   <v-dialog persistent v-model="isUpdateItem" width="800">
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Update {{itemName}}</v-card-title>
+      <v-card-title v-if="addItemCheck" class="headline mb-2">Add {{itemName}}</v-card-title>
+      <v-card-title v-else class="headline mb-2">Update {{itemName}}</v-card-title>
       <v-card-text>
         <v-text-field
+          v-if="!addItemCheck"
           v-model="selectedItem.entryCode"
           label="Entry Code"
           required
@@ -177,6 +196,7 @@ function goToResponseDatabasePage(QuizSessionID) {
         </v-radio-group>
 
         <v-menu
+          v-if="!addItemCheck"
           v-model="dateMenu"
           :close-on-content-click="false"
           transition="scale-transition"
@@ -198,11 +218,11 @@ function goToResponseDatabasePage(QuizSessionID) {
             scrollable
             :show-current="true"
           >
-            <template v-slot:actions>
-              <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
-            </template>
-          </v-date-picker>
-        </v-menu>
+          <template v-slot:actions>
+            <v-btn text color="primary" @click="dateMenu = false">OK</v-btn>
+          </template>
+        </v-date-picker>
+      </v-menu>
 
       </v-card-text>
       <v-card-actions>
