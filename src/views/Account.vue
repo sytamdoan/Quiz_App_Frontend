@@ -7,7 +7,7 @@ const isUpdateAccount = ref(false);
 const snackbar = ref({
   value: false,
   color: "",
-  text: "",
+  text: " ",
 });
 
 onMounted(async () => {
