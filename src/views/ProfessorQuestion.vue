@@ -267,8 +267,15 @@ async function endQuiz() {
 </script>
 
 <template>
-  <div class="timer" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+  <div class="timer" style="font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center;">
     Time Left: {{ timeLeft }}
+  </div>
+  <!-- the v-if forces the question to only dispaly once the question is loaded -->
+  <div 
+    v-if="questionSet.length" 
+    class="question-text" 
+    style="font-size: 20px; font-weight: 500; margin-bottom: 20px;">
+    {{ questionSet[currentQuestion].questionText }}
   </div>
   <div style="width: 700px; height: 500px;">
     <Bar :data="DataQuestions" :chart-options="chartSettings" />
