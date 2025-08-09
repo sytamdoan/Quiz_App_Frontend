@@ -10,6 +10,9 @@ export default {
   getQuizByQuestionId(questionID) {
     return apiClient.get("/Quiz/" + questionID + "/Question/");
   },
+  getAnswerKey(quizId) {
+    return apiClient.get("/Quiz/" + quizId + "/AnswerKey");
+  },
   addQuiz(classID, Quiz) {
     return apiClient.post("/Class/" + classID + "/Quiz/", Quiz);
   },
