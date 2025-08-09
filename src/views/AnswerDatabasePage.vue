@@ -3,12 +3,15 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import AnswerServices from "../services/AnswerServices.js";
+import QuestionServices from "../services/QuestionServices.js";
 import QuizServices from "../services/QuizServices.js";
 import { useRoute } from "vue-router";
 
 const Item = ref([])
 const route = useRoute();
 const myQuestionID = ref('')
+const questionText = ref('');
+const quizType = ref();
 const selectedItem = ref({})
 const isUpdateItem = ref(false);
 const isEditable = ref(false);
@@ -97,8 +100,20 @@ async function addItem(Item) {
 };
 
 async function fetchData() {
-  const response = await AnswerServices.getAnswer(myQuestionID.value)
+  // Get questionText
+  let response = await QuestionServices.getOneQuestion(myQuestionID.value)
+  questionText.value = response.data.questionText
+
+  // Get answers
+  response = await AnswerServices.getAnswer(myQuestionID.value)
   Item.value = response.data
+
+  // Get the IsPoll data
+  await QuizServices.getQuizByQuestionId(myQuestionID.value)
+  .then((res) => {
+    quizType.value = res.data.type
+    console.log(quizType.value)
+  })
 }
 
 function openUpdateModal(Item, addItem) {
@@ -126,6 +141,7 @@ function closeSnackBar() {
 
 <template>
   <h1 class="title">Answer Database</h1>
+  <h2 class="title">{{ questionText }}</h2>
   <v-text-field
     v-model="searchQuery"
     label="Search"
@@ -135,16 +151,19 @@ function closeSnackBar() {
     <thead>
       <tr>
         <th class="text-left">ID</th>
-        <th class="text-left">Answer Test</th>
-        <th class="text-left">Is Correct</th>
+        <th v-if="quizType=='quiz'" class="text-left">Is Correct</th>
+        <th class="text-left">Answer Text</th>
         <th class="text-left">Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="Item in filteredData" :key="Item.id" class="mb-2">
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.id }}</td>
+        <td v-if="quizType=='quiz'" class = "cursor-pointer" @click="openUpdateModal(Item, false)">
+          <v-icon v-if="Item.isCorrect" color="green">mdi-check-circle</v-icon>
+          <v-icon v-else color="red">mdi-close-circle</v-icon>
+        </td>
         <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.answerText }}</td>
-        <td class = "cursor-pointer" @click="openUpdateModal(Item, false)">{{ Item.isCorrect }}</td>
         <td v-if="isEditable">
           <v-icon color="red" class="cursor-pointer" @click="openUpdateModal(Item, false)"> mdi-pencil </v-icon>
           |
@@ -171,7 +190,7 @@ function closeSnackBar() {
           required
         ></v-text-field>
 
-        <v-radio-group
+        <v-radio-group v-if="quizType=='quiz'"
           v-model="selectedItem.isCorrect"
           label="Correct Answer?"
           required

@@ -13,22 +13,15 @@ import AnswerServices from '../services/AnswerServices.js';
 const itemName = "Response";
 const Item = ref([])
 const route = useRoute();
-const router = useRouter();
 const quizSessionId = ref('')
 const selectedItem = ref({})
 const isAddMenu = ref(false);
-const addItemCheck = ref(false);
 const searchQuery = ref('');
 const snackbar = ref({
   value: false,
   color: "",
   text: "",
 });
-
-// For swapping IDs with readable data
-const userData = ref([]);
-const questionData = ref([]);
-const answerData = ref([]);
 
 const filteredData = computed(() => {
   let data = Item.value;
@@ -92,43 +85,44 @@ async function fetchItems() {
     quizSessionId: quizSessionId.value
   }
   const response = await Services.getItems(filter)
+  
   // Swap IDs for readable data
-  // Note: can improve load speeds if we stored the found data
   const swapped = await Promise.all(
-    response.data.map(async (i) => {
-      let userNames = "";
-      let questionText = "";
-      let answerText = "";
-
-      // Get the user's first and last name
-      if (i.userId !== null) {
-        const res = await UserServices.getUserNames(i.userId)
-        userNames = res.data.firstName + " " + res.data.lastName
-      }
-      
-      // Get the question text
-      if (i.questionId !== null) {
-        const res = await QuestionServices.getOneQuestion(i.questionId)
-        questionText = res.data.questionText
-      }
-
-      // Get the answer text
-      if (i.answerId !== null) {
-        const res = await AnswerServices.getOneAnswer(i.answerId)
-        answerText = res.data.answerText
-      }
-      
-      return {
-        ...i,
-        userNames,
-        questionText,
-        answerText
-      }
-
-    })
+    response.data.map(getReadableText)
   );
-
   Item.value = swapped;
+}
+
+async function getReadableText(i) {
+  // Note: can improve load speeds if we stored the found data
+  let userNames = "";
+  let questionText = "";
+  let answerText = "";
+
+  // Get the user's first and last name
+  if (i.userId !== null) {
+    const res = await UserServices.getUserNames(i.userId)
+    userNames = res.data.firstName + " " + res.data.lastName
+  }
+  
+  // Get the question text
+  if (i.questionId !== null) {
+    const res = await QuestionServices.getOneQuestion(i.questionId)
+    questionText = res.data.questionText
+  }
+
+  // Get the answer text
+  if (i.answerId !== null) {
+    const res = await AnswerServices.getOneAnswer(i.answerId)
+    answerText = res.data.answerText
+  }
+  
+  return {
+    ...i,
+    userNames,
+    questionText,
+    answerText
+  }
 }
 
 function openAddMenu(Item) {
@@ -145,7 +139,6 @@ function closeSnackBar() {
 }
 
 async function downloadResponses() {
-  activateSnackbar("blue", "Download placeholder.");
   // (blank), Question ID, questionId, questionId, questionId
   // (blank), Answer Key, answerIds, answerIds, answerIds
   // score, StudentName, answerId, answerId, answerId
