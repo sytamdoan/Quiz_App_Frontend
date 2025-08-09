@@ -7,6 +7,8 @@ import { useRoute, useRouter } from "vue-router";
 
 // For swapping IDs with readable data
 import UserServices from "../services/UserServices.js"
+import QuizServices from "../services/QuizServices.js"
+import QuizSessionServices from "../services/QuizSessionServices.js"
 import QuestionServices from "../services/QuestionServices.js"
 import AnswerServices from '../services/AnswerServices.js';
 
@@ -14,6 +16,8 @@ const itemName = "Response";
 const Item = ref([])
 const route = useRoute();
 const quizSessionId = ref('')
+const quizId = ref('');
+const quizType = ref('');
 const selectedItem = ref({})
 const isAddMenu = ref(false);
 const searchQuery = ref('');
@@ -81,12 +85,19 @@ async function addItem(Item) {
 };
 
 async function fetchItems() {
+  // Get quiz ID
+  let response = await QuizSessionServices.getQuizSession(quizSessionId.value)
+  quizId.value = response.data.quizId;
+
+  // Get quizType
+  response = await QuizServices.getQuizById(quizId.value);
+  quizType.value = response.data.type;
+
+  // Get Responses and attach readable data
   const filter = {
     quizSessionId: quizSessionId.value
   }
-  const response = await Services.getItems(filter)
-  
-  // Swap IDs for readable data
+  response = await Services.getItems(filter)
   const swapped = await Promise.all(
     response.data.map(getReadableText)
   );
@@ -138,38 +149,19 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
-async function downloadResponses() {
-  // (blank), Question ID, questionId, questionId, questionId
-  // (blank), Answer Key, answerIds, answerIds, answerIds
-  // score, StudentName, answerId, answerId, answerId
-  // score, StudentName, answerId, answerId, answerId
-  // score, StudentName, answerId, answerId, answerId
-  // ...
+async function downloadQuizCSV() {
+  // Get the answer key
+  const response = await QuizServices.getAnswerKey(quizId.value)
+  const questionIDs = [];
+  const answerKeys = {};
+  response.data.forEach((i) => {
+    questionIDs.push(i.id);
 
-  // Get the ids of the questions
-  const questionIDs = new Set();
-  Item.value.forEach((item) => {
-    questionIDs.add(item.questionId)
+    const getIds = i.answer.map(object => object.id)
+    answerKeys[i.id] = getIds
   })
 
-  // Get correct answers
-  // TODO: Insert new service that gets the list of correct answers for each question
-  const answerKeys = {}
-  for (const item of questionIDs) {
-    const filter = {
-      questionId: item,
-      isCorrect: 1
-    }
-    const response = await AnswerServices.getAnswersWithFilter(filter)
-      .catch((error) => {
-        console.error(error);
-        activateSnackbar("red", error.response.data.message)
-      });
-    answerKeys[item] = response.data.map(object => object.id) // response.data.answerIDs
-    console.log(answerKeys);
-  }
-
-  // Populate table with correct data
+  // Get table of student responses
   const studentData = {}
   Item.value.forEach((item) => {
     // Check if studentId exists
@@ -233,6 +225,10 @@ async function downloadResponses() {
   anchor.click();
 }
 
+async function downloadPollCSV() {
+  activateSnackbar("red", "Poll CSV Download not implemented")
+}
+
 </script>
 
 <template>
@@ -240,7 +236,10 @@ async function downloadResponses() {
 
   <v-card-actions>
     <v-spacer></v-spacer>
-    <v-btn variant="flat" color="tertiary" @click="downloadResponses">
+    <v-btn v-if="quizType=='quiz'" variant="flat" color="tertiary" @click="downloadQuizCSV()">
+      <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
+    </v-btn>
+    <v-btn v-if="quizType=='poll'" variant="flat" color="tertiary" @click="downloadPollCSV()">
       <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
     </v-btn>
     <v-btn variant="flat" color="primary" @click="openAddMenu(item)">Add {{itemName}}</v-btn>
