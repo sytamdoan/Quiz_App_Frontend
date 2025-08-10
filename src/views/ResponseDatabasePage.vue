@@ -227,6 +227,60 @@ async function downloadQuizCSV() {
 
 async function downloadPollCSV() {
   activateSnackbar("red", "Poll CSV Download not implemented")
+
+  // All data needed for tallying the polls can be obtained here
+  const tallies = tally();
+
+  // Start creating CSV
+  let csv = "";
+  // Process each question
+  Object.keys(tallies).forEach((questionText) => {
+    // get the answer texts
+    const answerTexts = Object.keys(tallies[questionText]);
+
+    // get the tallies
+    const answerTallies = [];
+    answerTexts.forEach((aT, idx) => {
+      answerTallies[idx] = tallies[questionText][aT]
+    })
+
+    // Add first row of the question table
+    csv += questionText + "," + answerTexts.join(",");
+    csv += "\n";
+
+    // Add the tallies
+    csv += "," + answerTallies.join(",");
+    csv += "\n\n";
+  })
+
+  // Now download as a csv (referencing code from stackoverflow below)
+  // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
+  const anchor = document.createElement('a');
+  anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  anchor.target = '_blank';
+  anchor.download = 'responses.csv';
+  anchor.click();
+}
+
+function tally() {
+  const answerTallies = {}; // answerTallies[questionId][answerId] = numAnswered
+  Item.value.forEach((sRes) => {
+    // If question hasn't been seen before, make space for it
+    const questionId = sRes.questionText;
+    if (answerTallies[questionId] == undefined) {
+      answerTallies[questionId] = {};
+    }
+
+    // If answer hasn't been seen before, make space for it
+    const answerId = sRes.answerText;
+    if (answerTallies[questionId][answerId] == undefined) {
+      answerTallies[questionId][answerId] = 0
+    }
+
+    answerTallies[questionId][answerId]++ // tally student's answer
+  })
+
+  return answerTallies;
 }
 
 </script>
