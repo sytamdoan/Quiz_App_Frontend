@@ -3,6 +3,9 @@
 import { onMounted } from 'vue'
 import { ref, computed } from "vue";
 import QuizServices from "../services/QuizServices.js";
+import QuestionServices from "../services/QuestionServices.js";
+import AnswerServices from "../services/AnswerServices.js";
+import LLMServices from "../services/LLMServices.js";
 import QuizSessionServices from "../services/QuizSessionServices.js";
 import { useRoute, useRouter } from "vue-router";
 
@@ -162,6 +165,71 @@ async function startQuiz(Quiz) {
       snackbar.value.text = error.response.data.message;
     });
 };
+
+//Whole Quiz Generation Functoin
+function generateQuiz() {
+  //isLoading.value = true;
+  LLMServices.getGeneratedQuizForClass(myClassID.value)
+    .then((response) => {
+      const jsonText = response.data.slice(response.data.indexOf("```json")).replace(/```json\n?/, '').replace(/\n?```$/, '');
+      let results = JSON.parse(jsonText);
+      let newQuiz = {
+      classId: myClassID.value,
+      name:results.name,
+      type:'quiz',
+      subject: results.subject,
+      timeLimit:1,//Default to 1 minute
+      isResultsVisible:false,
+      isAnonymous:false,
+      isEditable:true
+      };
+      QuizServices.addQuiz(newQuiz.classId, newQuiz)
+      .then((quizResponse) => {
+        results.questions.forEach(element => {
+          //New Question Section
+          let newQuestion = {
+            quizId: quizResponse.data.id,
+            questionText: element.questionText,
+          }
+          let questionAnswers = element.answers;
+          QuestionServices.addQuestion(newQuestion.quizId,newQuestion)
+          .then((questionResponse)=>{
+            //New Answer Section
+            questionAnswers.forEach(answerElement => {
+                let newAnswer = {
+                questionId: questionResponse.data.id,
+                answerText: answerElement.answerText,
+                isCorrect: answerElement.isCorrect,
+              }
+              AnswerServices.addAnswer(newAnswer.questionId,newAnswer)
+              .catch((answerError)=>{
+                console.log(answerError);
+              });
+            });
+          })
+          .catch((questionError)=>{
+            console.log(questionError);
+          });
+        });
+        snackbar.value.value = true;
+        snackbar.value.color = "green";
+        snackbar.value.text = "Generated Quiz Added. Please Refresh Page";
+      })
+      .catch((error) => {
+        console.log(error);
+        snackbar.value.value = true;
+        snackbar.value.color = "red";
+        snackbar.value.text = "Error Adding Generated Quiz";
+      })
+      .finally(()=>{
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .finally(()=>{
+    });
+}
 </script>
 
 <template>
@@ -240,6 +308,7 @@ async function startQuiz(Quiz) {
   <v-card-actions>
     <v-spacer></v-spacer>
     <v-btn variant="flat" color="primary" @click="openUpdateQuiz(Quiz, true)">Add Quiz</v-btn>
+    <v-btn variant="flat" color="primary" @click="generateQuiz()">Generate Quiz</v-btn>
   </v-card-actions>
 
   <v-dialog persistent v-model="isUpdateQuiz" width="800">
