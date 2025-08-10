@@ -178,7 +178,7 @@ async function startQuiz(Quiz) {
         <th class="text-left">Name</th>
         <th class="text-left">Type</th>
         <th class="text-left">Subject</th>
-        <th class="text-left">Time Limit</th>
+        <th class="text-left">Time Limit (sec)</th>
       </tr>
     </thead>
     <tbody>
@@ -269,7 +269,7 @@ async function startQuiz(Quiz) {
 
         <v-text-field
           v-model="selectedQuiz.timeLimit"
-          label="Time Limit"
+          label="Time Limit (sec)"
           type = "number"
           required
         ></v-text-field>
