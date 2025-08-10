@@ -291,9 +291,11 @@ function tally() {
   <v-card-actions>
     <v-spacer></v-spacer>
     <v-btn v-if="quizType=='quiz'" variant="flat" color="tertiary" @click="downloadQuizCSV()">
+      Downlaod Quiz
       <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
     </v-btn>
     <v-btn v-if="quizType=='poll'" variant="flat" color="tertiary" @click="downloadPollCSV()">
+      Download Poll
       <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
     </v-btn>
     <v-btn variant="flat" color="primary" @click="openAddMenu(item)">Add {{itemName}}</v-btn>
