@@ -62,6 +62,7 @@ const router = createRouter({
       path: "/UserDatabasePage",
       name: "UserDatabasePage",
       component: () => import("./views/UserDatabasePage.vue"),
+      meta: { requiresAdmin: true },
     },
     {
       path: "/StudentQuestion/:quizSessionID",
@@ -88,7 +89,23 @@ const router = createRouter({
       name: "StudentEndQuizPage",
       component: () => import("./views/StudentEndQuizPage.vue"),
     },
+    {
+      path: "/forbidden",
+      name: "Forbidden",
+      component: () => import("./views/Forbidden.vue"),
+    },
   ],
+});
+
+// Global guard for admin-only pages
+router.beforeEach((to, from, next) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (to.meta.requiresAdmin) {
+    if (!user || Number(user.role) !== 2) {
+      return next({ name: "Forbidden" });
+    }
+  }
+  next();
 });
 
 export default router;
