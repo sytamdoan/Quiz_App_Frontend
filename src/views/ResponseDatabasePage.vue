@@ -312,7 +312,7 @@ function tally() {
         <th class="text-left">ID</th>
         <th class="text-left">Question</th>
         <th class="text-left">Answer</th>
-        <th class="text-left">User</th>
+        <th v-if="quizType!=='poll'" class="text-left">User</th>
       </tr>
     </thead>
     <tbody>
@@ -320,7 +320,7 @@ function tally() {
         <td class="cursor-pointer">{{ item.id }}</td>
         <td class="cursor-pointer" :title="'id='+item.questionId">{{ item.questionText }}</td>
         <td class="cursor-pointer" :title="'id='+item.answerId">{{ item.answerText }}</td>
-        <td class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames || "(anonymous)" }}</td>
+        <td v-if="quizType!=='poll'" class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames || "(missing)" }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
