@@ -106,9 +106,9 @@ async function fetchItems() {
 
 async function getReadableText(i) {
   // Note: can improve load speeds if we stored the found data
-  let userNames = "";
-  let questionText = "";
-  let answerText = "";
+  let userNames;
+  let questionText;
+  let answerText;
 
   // Get the user's first and last name
   if (i.userId !== null) {
@@ -320,7 +320,7 @@ function tally() {
         <td class="cursor-pointer">{{ item.id }}</td>
         <td class="cursor-pointer" :title="'id='+item.questionId">{{ item.questionText }}</td>
         <td class="cursor-pointer" :title="'id='+item.answerId">{{ item.answerText }}</td>
-        <td class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames }}</td>
+        <td class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames || "(anonymous)" }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
