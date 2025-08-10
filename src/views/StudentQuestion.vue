@@ -15,12 +15,14 @@ const currentQuestion = ref("");
 const answerSet = ref({})
 const selectedAnswer = ref();
 const waitingForNextQuestion = ref(true);
-const snackbar = ref({
-  value: false,
-  color: "",
-  text: "",
-});
 const user = ref({});
+const dialog = ref({
+  open: false,
+  mode: "alert",
+  color: "primary",
+  title: "",
+  text: ""
+});
 
 const quiz = ref({ timeLimit: 20 });
 const timeLeft = ref('00:00');
@@ -105,24 +107,32 @@ onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-function closeSnackBar() {
-    snackbar.value.value = false;
+function openConfirmationDialog() {
+  if (selectedAnswer.value) {
+    dialog.value = {
+      open: true,
+      mode: "confirm",
+      color: "primary",
+      title: "Confirm Submission",
+      text: "Submit this answer now?"
+    };
+  } else {
+    dialog.value = {
+      open: true,
+      mode: "alert",
+      color: "red",
+      title: "No Answer Selected",
+      text: "Please select an answer before submitting."
+    };
+  }
 }
 
-function openConfirmationBar() {
-    if(selectedAnswer.value) {
-        snackbar.value.color = "red";
-        snackbar.value.text = "Submit This Answer?";
-        snackbar.value.value = true;
-    } else {
-        snackbar.value.color = "red";
-        snackbar.value.text = "Please Select An Answer";
-        snackbar.value.value = true;
-    }
+function closeDialog() {
+  dialog.value.open = false;
 }
 
 function submitAnswer() {
-    snackbar.value.value = false;
+    dialog.value.open = false;
     socket.emit("response", {
         userId: user.value.id,
         quizSessionID: quizSessionID.value,
@@ -151,28 +161,30 @@ function submitAnswer() {
     </v-radio-group>
 
     <v-card-actions>
-        <v-btn variant="flat" color="primary" @click="openConfirmationBar()" v-if="!waitingForNextQuestion" :disabled="timerUp">Submit</v-btn>
+      <v-btn variant="flat" color="primary" @click="openConfirmationDialog" v-if="!waitingForNextQuestion" :disabled="timerUp">Submit</v-btn>
     </v-card-actions>
 
-    <v-snackbar v-model="snackbar.value" rounded="pill">
-      {{ snackbar.text }}
-      <template v-slot:actions>
-        <v-btn
-          variant="text"
-          @click="closeSnackBar()"
-        >
-          Close
-        </v-btn>
-        <v-btn
-          v-if="selectedAnswer"
-          :color="snackbar.color"
-          variant="text"
-          @click="submitAnswer()"
-        >
-          Submit
-        </v-btn>
-      </template>
-    </v-snackbar>
+    <v-dialog v-model="dialog.open" max-width="420" persistent>
+      <v-card>
+        <v-card-title class="text-h6">{{ dialog.title }}</v-card-title>
+        <v-card-text>{{ dialog.text }}</v-card-text>
+
+        <v-card-actions class="justify-end">
+          <v-btn variant="text" @click="closeDialog">Close</v-btn>
+
+          <!-- Only show "Submit" when it's a confirm dialog AND an answer is selected -->
+          <v-btn
+            v-if="dialog.mode === 'confirm' && selectedAnswer"
+            :color="dialog.color"
+            variant="flat"
+            @click="submitAnswer"
+          >
+            Submit
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
 </template>
 
 <style scoped>
