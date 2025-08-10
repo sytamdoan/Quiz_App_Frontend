@@ -137,7 +137,7 @@ function submitAnswer() {
     <h1 style="text-align: center;" v-if="!waitingForNextQuestion">{{ currentQuestion }}</h1>
     <h1 style="text-align: center;" v-if="waitingForNextQuestion">Please Wait for Instructor</h1>
 
-    <div class="timer" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+    <div class="timer" style="font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center;">
       Time Left: {{ timeLeft }}
     </div>
 
