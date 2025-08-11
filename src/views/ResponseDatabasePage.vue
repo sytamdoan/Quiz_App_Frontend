@@ -106,9 +106,9 @@ async function fetchItems() {
 
 async function getReadableText(i) {
   // Note: can improve load speeds if we stored the found data
-  let userNames = "";
-  let questionText = "";
-  let answerText = "";
+  let userNames;
+  let questionText;
+  let answerText;
 
   // Get the user's first and last name
   if (i.userId !== null) {
@@ -226,7 +226,59 @@ async function downloadQuizCSV() {
 }
 
 async function downloadPollCSV() {
-  activateSnackbar("red", "Poll CSV Download not implemented")
+  // All data needed for tallying the polls can be obtained here
+  const tallies = tally();
+
+  // Start creating CSV
+  let csv = "";
+  // Process each question
+  Object.keys(tallies).forEach((questionText) => {
+    // get the answer texts
+    const answerTexts = Object.keys(tallies[questionText]);
+
+    // get the tallies
+    const answerTallies = [];
+    answerTexts.forEach((aT, idx) => {
+      answerTallies[idx] = tallies[questionText][aT]
+    })
+
+    // Add first row of the question table
+    csv += questionText + "," + answerTexts.join(",");
+    csv += "\n";
+
+    // Add the tallies
+    csv += "," + answerTallies.join(",");
+    csv += "\n\n";
+  })
+
+  // Now download as a csv (referencing code from stackoverflow below)
+  // https://stackoverflow.com/questions/58292771/downloading-a-csv-of-file-using-vue-and-js
+  const anchor = document.createElement('a');
+  anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  anchor.target = '_blank';
+  anchor.download = 'responses.csv';
+  anchor.click();
+}
+
+function tally() {
+  const answerTallies = {}; // answerTallies[questionId][answerId] = numAnswered
+  Item.value.forEach((sRes) => {
+    // If question hasn't been seen before, make space for it
+    const questionId = sRes.questionText;
+    if (answerTallies[questionId] == undefined) {
+      answerTallies[questionId] = {};
+    }
+
+    // If answer hasn't been seen before, make space for it
+    const answerId = sRes.answerText;
+    if (answerTallies[questionId][answerId] == undefined) {
+      answerTallies[questionId][answerId] = 0
+    }
+
+    answerTallies[questionId][answerId]++ // tally student's answer
+  })
+
+  return answerTallies;
 }
 
 </script>
@@ -237,9 +289,11 @@ async function downloadPollCSV() {
   <v-card-actions>
     <v-spacer></v-spacer>
     <v-btn v-if="quizType=='quiz'" variant="flat" color="tertiary" @click="downloadQuizCSV()">
+      Download Quiz
       <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
     </v-btn>
     <v-btn v-if="quizType=='poll'" variant="flat" color="tertiary" @click="downloadPollCSV()">
+      Download Poll
       <v-icon color="primary" class="cursor-pointer">mdi-arrow-down</v-icon>
     </v-btn>
     <v-btn variant="flat" color="primary" @click="openAddMenu(item)">Add {{itemName}}</v-btn>
@@ -256,7 +310,7 @@ async function downloadPollCSV() {
         <th class="text-left">ID</th>
         <th class="text-left">Question</th>
         <th class="text-left">Answer</th>
-        <th class="text-left">User</th>
+        <th v-if="quizType!=='poll'" class="text-left">User</th>
       </tr>
     </thead>
     <tbody>
@@ -264,7 +318,7 @@ async function downloadPollCSV() {
         <td class="cursor-pointer">{{ item.id }}</td>
         <td class="cursor-pointer" :title="'id='+item.questionId">{{ item.questionText }}</td>
         <td class="cursor-pointer" :title="'id='+item.answerId">{{ item.answerText }}</td>
-        <td class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames }}</td>
+        <td v-if="quizType!=='poll'" class="cursor-pointer" :title="'id='+item.userId">{{ item.userNames }}</td>
         <td>
           <v-icon color="red" class="cursor-pointer" @click="deleteItem(item.id)"> mdi-delete </v-icon>
         </td>
