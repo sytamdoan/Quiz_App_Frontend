@@ -226,8 +226,6 @@ async function downloadQuizCSV() {
 }
 
 async function downloadPollCSV() {
-  activateSnackbar("red", "Poll CSV Download not implemented")
-
   // All data needed for tallying the polls can be obtained here
   const tallies = tally();
 
