@@ -168,6 +168,9 @@ async function startQuiz(Quiz) {
 
 //Whole Quiz Generation Functoin
 async function generateQuiz() {
+  snackbar.value.value = true;
+  snackbar.value.color = "yellow";
+  snackbar.value.text = "Loading";
   //isLoading.value = true;
   await LLMServices.getGeneratedQuizForClass(myClassID.value)
     .then((response) => {
