@@ -167,9 +167,9 @@ async function startQuiz(Quiz) {
 };
 
 //Whole Quiz Generation Functoin
-function generateQuiz() {
+async function generateQuiz() {
   //isLoading.value = true;
-  LLMServices.getGeneratedQuizForClass(myClassID.value)
+  await LLMServices.getGeneratedQuizForClass(myClassID.value)
     .then((response) => {
       const jsonText = response.data.slice(response.data.indexOf("```json")).replace(/```json\n?/, '').replace(/\n?```$/, '');
       let results = JSON.parse(jsonText);
@@ -213,21 +213,20 @@ function generateQuiz() {
         });
         snackbar.value.value = true;
         snackbar.value.color = "green";
-        snackbar.value.text = "Generated Quiz Added. Please Refresh Page";
+        snackbar.value.text = "Generated Quiz Added";
       })
       .catch((error) => {
         console.log(error);
         snackbar.value.value = true;
         snackbar.value.color = "red";
         snackbar.value.text = "Error Adding Generated Quiz";
-      })
-      .finally(()=>{
       });
     })
     .catch((error) => {
       console.log(error);
     })
     .finally(()=>{
+      fetchQuiz();
     });
 }
 </script>
